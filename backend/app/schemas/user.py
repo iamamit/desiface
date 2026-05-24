@@ -32,6 +32,12 @@ class UserLogin(BaseModel):
     password: str
 
 
+class UserUpdate(BaseModel):
+    full_name: str | None = None
+    bio: str | None = None
+    avatar_url: str | None = None
+
+
 class UserPublic(BaseModel):
     id: uuid.UUID
     email: str
