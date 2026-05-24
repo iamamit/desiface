@@ -88,6 +88,11 @@ export default function RegisterPage() {
             />
           </div>
 
+          <p className="text-xs text-gray-400 leading-relaxed">
+            By creating an account you agree that your data is stored in the EU and processed in accordance with the{" "}
+            <span className="underline">GDPR</span>. We never sell your data.
+          </p>
+
           <button
             type="submit"
             disabled={isLoading}
