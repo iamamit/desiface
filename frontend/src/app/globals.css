@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
 body {
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #F3F2EF;
+  color: #1c1c1c;
 }

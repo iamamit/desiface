@@ -18,48 +18,57 @@ export default function MessagesPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F3F2EF]">
       <Navbar />
-      <div className="max-w-xl mx-auto py-6 px-4">
-        <h1 className="text-lg font-semibold text-gray-800 mb-4">Messages</h1>
+      <div className="max-w-[1080px] mx-auto px-4 py-4">
+        <div className="bg-white rounded-lg border border-[#E0DFDC] overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[#E0DFDC]">
+            <h1 className="text-base font-semibold text-gray-900">Messaging</h1>
+            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </div>
 
-        {loading ? (
-          <div className="flex justify-center py-10">
-            <div className="w-7 h-7 border-4 border-orange-400 border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : conversations.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm p-8 text-center text-sm text-gray-400">
-            No messages yet. Visit someone&apos;s profile to start a conversation.
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {conversations.map((c) => (
-              <Link key={c.user.id} href={`/messages/${c.user.username}`}
-                className="bg-white rounded-2xl shadow-sm p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors block"
-              >
-                <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 font-bold text-sm flex-shrink-0">
-                  {(c.user.full_name ?? c.user.username).slice(0, 2).toUpperCase()}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-gray-800 truncate">{c.user.full_name ?? c.user.username}</p>
-                    <p className="text-xs text-gray-400 flex-shrink-0">
-                      {new Date(c.last_message_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
-                    </p>
+          {loading ? (
+            <div className="flex justify-center py-10">
+              <div className="w-7 h-7 border-4 border-[#0A66C2] border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : conversations.length === 0 ? (
+            <div className="p-8 text-center text-sm text-gray-400">
+              No messages yet. Visit someone&apos;s profile to start a conversation.
+            </div>
+          ) : (
+            <div>
+              {conversations.map((c) => (
+                <Link
+                  key={c.user.id}
+                  href={`/messages/${c.user.username}`}
+                  className="flex items-center gap-3 px-4 py-3 border-b border-[#E0DFDC] last:border-0 hover:bg-gray-50 transition-colors"
+                >
+                  <div className="w-12 h-12 rounded-full bg-[#EEF3F8] flex items-center justify-center text-[#0A66C2] font-bold text-sm flex-shrink-0">
+                    {(c.user.full_name ?? c.user.username).slice(0, 2).toUpperCase()}
                   </div>
-                  <div className="flex items-center justify-between mt-0.5">
-                    <p className="text-xs text-gray-500 truncate">{c.last_message}</p>
-                    {c.unread_count > 0 && (
-                      <span className="ml-2 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold flex-shrink-0">
-                        {c.unread_count}
-                      </span>
-                    )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold text-gray-900 truncate">{c.user.full_name ?? c.user.username}</p>
+                      <p className="text-xs text-gray-400 flex-shrink-0 ml-2">
+                        {new Date(c.last_message_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between mt-0.5">
+                      <p className="text-xs text-gray-500 truncate">{c.last_message}</p>
+                      {c.unread_count > 0 && (
+                        <span className="ml-2 bg-[#0A66C2] text-white text-[10px] rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-bold flex-shrink-0 px-1">
+                          {c.unread_count}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

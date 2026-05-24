@@ -48,7 +48,7 @@ test.describe("Notifications", () => {
 
     // userB reloads feed — notification count should appear in bell
     await pageB.goto("/feed");
-    await expect(pageB.locator("nav").locator("text=1")).toBeVisible({ timeout: 5000 });
+    await expect(pageB.getByTestId("notif-badge")).toBeVisible({ timeout: 5000 });
 
     await ctxB.close();
   });
@@ -74,7 +74,7 @@ test.describe("Notifications", () => {
     await pageB.goto("/feed");
     // Give the unread-count poll a moment to reflect
     await page.waitForTimeout(1000);
-    await expect(pageB.locator("nav").locator("text=1")).not.toBeVisible();
+    await expect(pageB.getByTestId("notif-badge")).not.toBeVisible();
 
     await ctxB.close();
   });
@@ -91,7 +91,7 @@ test.describe("Notifications", () => {
     // userA creates a post
     await register(page, userA);
     const content = `Notification like test ${Date.now()}`;
-    await page.fill('textarea[placeholder="What\'s on your mind?"]', content);
+    await page.fill('textarea[placeholder="Start a post"]', content);
     await page.getByRole("button", { name: "Post" }).click();
     await expect(page.locator("text=" + content)).toBeVisible({ timeout: 5000 });
 

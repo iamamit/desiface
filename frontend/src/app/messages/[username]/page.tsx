@@ -42,57 +42,68 @@ export default function ConversationPage() {
     }
   }
 
+  const otherInitials = other ? (other.full_name ?? other.username).slice(0, 2).toUpperCase() : "";
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="h-screen bg-[#F3F2EF] flex flex-col">
       <Navbar />
 
-      {/* Chat header */}
-      <div className="bg-white border-b px-4 py-3 flex items-center gap-3 max-w-xl mx-auto w-full">
-        {other && (
-          <>
-            <div className="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 font-bold text-sm">
-              {(other.full_name ?? other.username).slice(0, 2).toUpperCase()}
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-gray-800">{other.full_name ?? other.username}</p>
-              <p className="text-xs text-gray-400">@{other.username}</p>
-            </div>
-          </>
-        )}
-      </div>
+      <div className="flex-1 flex max-w-[1080px] mx-auto w-full px-4 py-4 overflow-hidden">
+        <div className="flex-1 bg-white rounded-lg border border-[#E0DFDC] flex flex-col overflow-hidden">
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto max-w-xl mx-auto w-full px-4 py-4 space-y-2">
-        {messages.map((m) => {
-          const isMine = m.sender.id === me?.id;
-          return (
-            <div key={m.id} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-xs px-4 py-2 rounded-2xl text-sm ${isMine ? "bg-orange-500 text-white rounded-br-sm" : "bg-white text-gray-700 shadow-sm rounded-bl-sm"}`}>
-                {m.content}
+          {/* Chat header */}
+          {other && (
+            <div className="px-4 py-3 border-b border-[#E0DFDC] flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#EEF3F8] flex items-center justify-center text-[#0A66C2] font-bold text-sm">
+                {otherInitials}
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-900">{other.full_name ?? other.username}</p>
+                <p className="text-xs text-gray-400">@{other.username}</p>
               </div>
             </div>
-          );
-        })}
-        <div ref={bottomRef} />
-      </div>
+          )}
 
-      {/* Input */}
-      <div className="bg-white border-t px-4 py-3 max-w-xl mx-auto w-full">
-        <form onSubmit={send} className="flex gap-2">
-          <input
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Type a message…"
-            className="flex-1 rounded-full bg-gray-100 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
-          />
-          <button
-            type="submit"
-            disabled={sending || !text.trim()}
-            className="rounded-full bg-orange-500 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 transition-colors"
-          >
-            Send
-          </button>
-        </form>
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
+            {messages.map((m) => {
+              const isMine = m.sender.id === me?.id;
+              return (
+                <div key={m.id} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
+                  <div
+                    className={`max-w-xs px-4 py-2 rounded-2xl text-sm ${
+                      isMine
+                        ? "bg-[#0A66C2] text-white rounded-br-sm"
+                        : "bg-[#F3F2EF] text-gray-800 rounded-bl-sm"
+                    }`}
+                  >
+                    {m.content}
+                  </div>
+                </div>
+              );
+            })}
+            <div ref={bottomRef} />
+          </div>
+
+          {/* Input */}
+          <div className="border-t border-[#E0DFDC] px-4 py-3">
+            <form onSubmit={send} className="flex gap-2">
+              <input
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Type a message…"
+                className="flex-1 rounded-full bg-[#F3F2EF] border border-[#C0C0C0] px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-[#0A66C2]"
+              />
+              <button
+                type="submit"
+                disabled={sending || !text.trim()}
+                className="rounded-full bg-[#0A66C2] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 hover:bg-[#004182] transition-colors"
+              >
+                Send
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   );

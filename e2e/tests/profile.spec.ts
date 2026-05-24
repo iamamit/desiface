@@ -8,7 +8,7 @@ test.describe("Profile", () => {
     await register(page, user);
 
     await page.goto(`/profile/${user.username}`);
-    await expect(page.locator("text=@" + user.username)).toBeVisible();
+    await expect(page.getByTestId("profile-username")).toContainText("@" + user.username);
     await expect(page.getByRole("button", { name: "Edit profile" })).toBeVisible();
   });
 
@@ -28,7 +28,7 @@ test.describe("Profile", () => {
     await page.getByRole("button", { name: "Edit profile" }).click();
 
     // Modal should be open
-    await expect(page.locator("text=Edit profile").nth(1)).toBeVisible();
+    await expect(page.locator("text=Edit intro")).toBeVisible();
 
     const bio = `Bio set by Playwright at ${Date.now()}`;
     await page.locator('textarea[placeholder="Tell people a little about yourself"]').fill(bio);
@@ -46,7 +46,7 @@ test.describe("Profile", () => {
     await page.getByRole("button", { name: "Edit profile" }).click();
     await page.getByRole("button", { name: "Cancel" }).click();
 
-    await expect(page.locator("text=Edit profile").nth(1)).not.toBeVisible();
+    await expect(page.locator("text=Edit intro")).not.toBeVisible();
   });
 
   test("other user profile: shows Connect and Message buttons", async ({ page, browser }) => {
@@ -80,7 +80,7 @@ test.describe("Profile", () => {
     await register(page, user);
 
     await page.locator("nav .group").hover();
-    await page.getByRole("link", { name: "Profile" }).click();
+    await page.getByRole("link", { name: "View Profile" }).click();
 
     await expect(page).toHaveURL(new RegExp(`/profile/${user.username}`));
   });

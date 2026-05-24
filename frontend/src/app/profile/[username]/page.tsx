@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import EditProfileModal from "@/components/EditProfileModal";
+import LeftSidebar from "@/components/LeftSidebar";
 import Navbar from "@/components/Navbar";
 import api from "@/lib/api";
 import { useAuthStore } from "@/store/auth";
@@ -61,9 +62,14 @@ export default function ProfilePage() {
     return "Connect";
   }
 
+  const initials = profile ? (profile.full_name ?? profile.username).slice(0, 2).toUpperCase() : "";
+  const joinDate = profile
+    ? new Date(profile.created_at).toLocaleDateString("en-GB", { month: "long", year: "numeric" })
+    : "";
+
   if (notFound) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-[#F3F2EF]">
         <Navbar />
         <div className="flex items-center justify-center py-20">
           <p className="text-gray-500">User <span className="font-semibold">@{username}</span> not found.</p>
@@ -74,83 +80,110 @@ export default function ProfilePage() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-[#F3F2EF]">
         <Navbar />
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-4 border-orange-400 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-[#0A66C2] border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     );
   }
 
-  const initials = (profile.full_name ?? profile.username).slice(0, 2).toUpperCase();
-  const joinDate = new Date(profile.created_at).toLocaleDateString("en-GB", { month: "long", year: "numeric" });
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F3F2EF]">
       <Navbar />
-      <div className="max-w-2xl mx-auto py-10 px-4">
-        <div className="bg-white rounded-2xl shadow-sm p-8">
-          <div className="flex items-start gap-6">
-            {profile.avatar_url ? (
-              <img src={profile.avatar_url} alt={profile.username} className="w-20 h-20 rounded-full object-cover" />
-            ) : (
-              <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 text-2xl font-bold flex-shrink-0">
-                {initials}
-              </div>
-            )}
+      <div className="max-w-[1080px] mx-auto px-4 py-4">
+        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-4">
 
-            <div className="flex-1 min-w-0">
-              <h1 className="text-xl font-bold text-gray-900 truncate">{profile.full_name ?? profile.username}</h1>
-              <p className="text-sm text-gray-400">@{profile.username}</p>
-              {profile.bio && <p className="mt-3 text-gray-600 text-sm leading-relaxed">{profile.bio}</p>}
-              <p className="mt-3 text-xs text-gray-400">Joined {joinDate}</p>
+          {/* Left sidebar (own info — only if logged in as someone else) */}
+          {me && (
+            <div className="hidden lg:block">
+              <div className="sticky top-20">
+                <LeftSidebar />
+              </div>
+            </div>
+          )}
+
+          {/* Profile card */}
+          <div className="space-y-2">
+            <div className="bg-white rounded-lg border border-[#E0DFDC] overflow-hidden">
+              {/* Cover */}
+              <div className="h-32 bg-gradient-to-r from-[#0A66C2] to-[#004182]" />
+
+              {/* Avatar + actions row */}
+              <div className="px-6 pb-4">
+                <div className="flex items-end justify-between -mt-12 mb-3">
+                  {profile.avatar_url ? (
+                    <img
+                      src={profile.avatar_url}
+                      alt={profile.username}
+                      className="w-24 h-24 rounded-full border-4 border-white object-cover"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full border-4 border-white bg-[#0A66C2] flex items-center justify-center text-white font-bold text-3xl">
+                      {initials}
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-2 mb-1">
+                    {isOwner ? (
+                      <button
+                        onClick={() => setEditing(true)}
+                        className="rounded-full border-2 border-[#0A66C2] px-4 py-1.5 text-sm font-semibold text-[#0A66C2] hover:bg-[#EEF3F8] transition-colors"
+                      >
+                        Edit profile
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          onClick={handleConnect}
+                          disabled={connecting || connStatus?.pending_sent}
+                          className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-colors ${
+                            connStatus?.connected
+                              ? "border-2 border-gray-400 text-gray-600 hover:border-red-400 hover:text-red-400"
+                              : connStatus?.pending_received
+                              ? "bg-[#0A66C2] text-white hover:bg-[#004182]"
+                              : connStatus?.pending_sent
+                              ? "border-2 border-gray-300 text-gray-400"
+                              : "bg-[#0A66C2] text-white hover:bg-[#004182]"
+                          }`}
+                        >
+                          {connectLabel()}
+                        </button>
+                        <button
+                          onClick={() => router.push(`/messages/${profile.username}`)}
+                          className="rounded-full border-2 border-[#0A66C2] px-4 py-1.5 text-sm font-semibold text-[#0A66C2] hover:bg-[#EEF3F8] transition-colors"
+                        >
+                          Message
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <h1 className="text-xl font-bold text-gray-900">{profile.full_name ?? profile.username}</h1>
+                <p className="text-sm text-gray-600" data-testid="profile-username">@{profile.username}</p>
+                {profile.bio && (
+                  <p className="mt-2 text-sm text-gray-700 leading-relaxed">{profile.bio}</p>
+                )}
+                <p className="mt-2 text-xs text-gray-400">Joined {joinDate}</p>
+              </div>
             </div>
 
-            <div className="flex flex-col gap-2 flex-shrink-0">
-              {isOwner ? (
-                <button
-                  onClick={() => setEditing(true)}
-                  className="rounded-lg border border-gray-200 px-4 py-1.5 text-sm font-medium text-gray-600 hover:border-orange-400 hover:text-orange-500 transition-colors"
-                >
-                  Edit profile
-                </button>
-              ) : (
-                <>
-                  <button
-                    onClick={handleConnect}
-                    disabled={connecting || connStatus?.pending_sent}
-                    className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
-                      connStatus?.connected
-                        ? "border border-gray-200 text-gray-500 hover:border-red-300 hover:text-red-400"
-                        : connStatus?.pending_received
-                        ? "bg-green-500 text-white hover:bg-green-600"
-                        : connStatus?.pending_sent
-                        ? "bg-gray-100 text-gray-400"
-                        : "bg-orange-500 text-white hover:bg-orange-600"
-                    }`}
-                  >
-                    {connectLabel()}
-                  </button>
-                  <button
-                    onClick={() => router.push(`/messages/${profile.username}`)}
-                    className="rounded-lg border border-gray-200 px-4 py-1.5 text-sm font-medium text-gray-600 hover:border-orange-400 hover:text-orange-500 transition-colors"
-                  >
-                    Message
-                  </button>
-                </>
-              )}
+            {/* Activity section */}
+            <div className="bg-white rounded-lg border border-[#E0DFDC] p-6 text-center text-gray-400 text-sm">
+              No posts yet.
             </div>
           </div>
-        </div>
-
-        <div className="mt-6 bg-white rounded-2xl shadow-sm p-8 text-center text-gray-400 text-sm">
-          No posts yet.
         </div>
       </div>
 
       {editing && (
-        <EditProfileModal profile={profile} onSaved={(u) => { setProfile(u); setEditing(false); }} onClose={() => setEditing(false)} />
+        <EditProfileModal
+          profile={profile}
+          onSaved={(u) => { setProfile(u); setEditing(false); }}
+          onClose={() => setEditing(false)}
+        />
       )}
     </div>
   );

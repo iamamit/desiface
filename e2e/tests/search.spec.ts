@@ -14,7 +14,7 @@ test.describe("Search", () => {
 
     await register(page, userA);
 
-    await page.fill('input[placeholder="Search people…"]', userB.username);
+    await page.fill('input[placeholder="Search"]', userB.username);
     await expect(page.locator("text=@" + userB.username)).toBeVisible({ timeout: 5000 });
   });
 
@@ -31,7 +31,7 @@ test.describe("Search", () => {
 
     // Search by unique suffix of full name (the ID portion)
     const partialName = userB.full_name.split(" ").pop()!.slice(0, 6);
-    await page.fill('input[placeholder="Search people…"]', partialName);
+    await page.fill('input[placeholder="Search"]', partialName);
     await expect(page.locator(`text=@${userB.username}`)).toBeVisible({ timeout: 5000 });
   });
 
@@ -46,7 +46,7 @@ test.describe("Search", () => {
 
     await register(page, userA);
 
-    await page.fill('input[placeholder="Search people…"]', userB.username);
+    await page.fill('input[placeholder="Search"]', userB.username);
     await expect(page.locator("text=@" + userB.username)).toBeVisible({ timeout: 5000 });
 
     // Click the result
@@ -65,11 +65,11 @@ test.describe("Search", () => {
 
     await register(page, userA);
 
-    await page.fill('input[placeholder="Search people…"]', userB.username);
+    await page.fill('input[placeholder="Search"]', userB.username);
     await expect(page.locator("text=@" + userB.username)).toBeVisible({ timeout: 5000 });
 
     // Clear input
-    await page.fill('input[placeholder="Search people…"]', "");
+    await page.fill('input[placeholder="Search"]', "");
     await expect(page.locator("text=@" + userB.username)).not.toBeVisible({ timeout: 3000 });
   });
 
@@ -77,7 +77,7 @@ test.describe("Search", () => {
     const user = makeUser();
     await register(page, user);
 
-    await page.fill('input[placeholder="Search people…"]', "xqzxqzxqz99999");
+    await page.fill('input[placeholder="Search"]', "xqzxqzxqz99999");
     // Wait for debounce (300ms) and confirm no dropdown
     await page.waitForTimeout(500);
     // The dropdown div should not exist

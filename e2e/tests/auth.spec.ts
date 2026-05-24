@@ -7,7 +7,7 @@ test.describe("Auth", () => {
     const user = makeUser();
     await register(page, user);
     await expect(page).toHaveURL(/\/feed/);
-    await expect(page.locator("nav")).toContainText("Desiface");
+    await expect(page.locator('textarea[placeholder="Start a post"]')).toBeVisible();
   });
 
   test("register: shows GDPR notice", async ({ page }) => {

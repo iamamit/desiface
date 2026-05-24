@@ -2,12 +2,16 @@
 
 import { useEffect, useState } from "react";
 
+import LeftSidebar from "@/components/LeftSidebar";
 import Navbar from "@/components/Navbar";
 import PostCard from "@/components/PostCard";
+import RightSidebar from "@/components/RightSidebar";
 import api from "@/lib/api";
+import { useAuthStore } from "@/store/auth";
 import type { Post } from "@/types/post";
 
 export default function FeedPage() {
+  const { user } = useAuthStore();
   const [posts, setPosts] = useState<Post[]>([]);
   const [content, setContent] = useState("");
   const [posting, setPosting] = useState(false);
@@ -32,49 +36,119 @@ export default function FeedPage() {
     }
   }
 
+  const initials = user ? (user.full_name ?? user.username).slice(0, 2).toUpperCase() : "";
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F3F2EF]">
       <Navbar />
-      <div className="max-w-xl mx-auto py-6 px-4 space-y-4">
+      <div className="max-w-[1080px] mx-auto px-4 py-4">
+        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr_300px] gap-4">
 
-        {/* Create post */}
-        <form onSubmit={handlePost} className="bg-white rounded-2xl shadow-sm p-4">
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="What's on your mind?"
-            rows={3}
-            className="w-full resize-none text-sm text-gray-700 placeholder-gray-400 focus:outline-none"
-          />
-          <div className="flex justify-end mt-2 pt-2 border-t border-gray-50">
-            <button
-              type="submit"
-              disabled={posting || !content.trim()}
-              className="rounded-full bg-orange-500 px-5 py-1.5 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-50 transition-colors"
-            >
-              {posting ? "Posting…" : "Post"}
-            </button>
+          {/* Left sidebar */}
+          <div className="hidden lg:block">
+            <div className="sticky top-20">
+              <LeftSidebar />
+            </div>
           </div>
-        </form>
 
-        {/* Feed */}
-        {loading ? (
-          <div className="flex justify-center py-10">
-            <div className="w-7 h-7 border-4 border-orange-400 border-t-transparent rounded-full animate-spin" />
+          {/* Main feed */}
+          <div className="min-w-0 space-y-2">
+
+            {/* Create post */}
+            <div className="bg-white rounded-lg border border-[#E0DFDC] p-3">
+              <div className="flex items-center gap-3 mb-3">
+                {user?.avatar_url ? (
+                  <img src={user.avatar_url} alt="" className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-[#0A66C2] flex items-center justify-center text-white font-bold flex-shrink-0">
+                    {initials}
+                  </div>
+                )}
+                <form onSubmit={handlePost} className="flex-1">
+                  <textarea
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    placeholder="Start a post"
+                    rows={content ? 3 : 1}
+                    className="w-full resize-none text-sm text-gray-700 placeholder-gray-500 border border-[#C0C0C0] rounded-full px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-[#0A66C2] focus:rounded-lg transition-all"
+                  />
+                  {content.trim() && (
+                    <div className="flex justify-end mt-2">
+                      <button
+                        type="submit"
+                        disabled={posting}
+                        className="rounded-full bg-[#0A66C2] px-5 py-1.5 text-sm font-semibold text-white hover:bg-[#004182] disabled:opacity-50 transition-colors"
+                      >
+                        {posting ? "Posting…" : "Post"}
+                      </button>
+                    </div>
+                  )}
+                </form>
+              </div>
+
+              {/* Action shortcuts */}
+              <div className="flex items-center gap-1 border-t border-[#E0DFDC] pt-2">
+                <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                  <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M15 10l4.553-2.069A1 1 0 0121 8.868V15.13a1 1 0 01-1.447.899L15 14M3 8h12a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V9a1 1 0 011-1z" />
+                  </svg>
+                  Video
+                </button>
+                <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Photo
+                </button>
+                <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                  <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Write article
+                </button>
+              </div>
+            </div>
+
+            {/* Sort bar */}
+            {posts.length > 0 && (
+              <div className="bg-white rounded-lg border border-[#E0DFDC] px-4 py-2 flex items-center gap-2">
+                <span className="text-xs text-gray-500">Sort by:</span>
+                <button className="text-xs font-semibold text-gray-700 flex items-center gap-1">
+                  Top
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            )}
+
+            {/* Feed */}
+            {loading ? (
+              <div className="flex justify-center py-10">
+                <div className="w-7 h-7 border-4 border-[#0A66C2] border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : posts.length === 0 ? (
+              <div className="bg-white rounded-lg border border-[#E0DFDC] p-8 text-center">
+                <p className="text-gray-500 text-sm">No posts yet. Connect with people or be the first to post!</p>
+              </div>
+            ) : (
+              posts.map((p) => (
+                <PostCard
+                  key={p.id}
+                  post={p}
+                  onDeleted={(id) => setPosts((prev) => prev.filter((x) => x.id !== id))}
+                />
+              ))
+            )}
           </div>
-        ) : posts.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
-            <p className="text-gray-400 text-sm">No posts yet. Connect with people or be the first to post!</p>
+
+          {/* Right sidebar */}
+          <div className="hidden lg:block">
+            <div className="sticky top-20">
+              <RightSidebar />
+            </div>
           </div>
-        ) : (
-          posts.map((p) => (
-            <PostCard
-              key={p.id}
-              post={p}
-              onDeleted={(id) => setPosts((prev) => prev.filter((x) => x.id !== id))}
-            />
-          ))
-        )}
+        </div>
       </div>
     </div>
   );
