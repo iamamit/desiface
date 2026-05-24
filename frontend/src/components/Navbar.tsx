@@ -200,6 +200,12 @@ export default function Navbar() {
                 </div>
                 <div className="border-t border-[#E0DFDC] py-2">
                   <p className="text-xs font-semibold text-gray-500 px-4 mb-1">Account</p>
+                  <Link
+                    href="/settings"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    Settings
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"

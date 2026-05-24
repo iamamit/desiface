@@ -11,12 +11,13 @@ import type { User } from "@/types/user";
 
 export default function ConversationPage() {
   const { username } = useParams<{ username: string }>();
-  const { user: me } = useAuthStore();
+  const { user: me, token } = useAuthStore();
   const [other, setOther] = useState<User | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
     api.get<User>(`/users/${username}`).then((r) => {
@@ -24,6 +25,45 @@ export default function ConversationPage() {
       return api.get<Message[]>(`/messages/${r.data.id}`);
     }).then((r) => setMessages(r.data)).catch(() => {});
   }, [username]);
+
+  useEffect(() => {
+    if (!token) return;
+    const wsUrl = `ws://localhost:8000/ws?token=${token}`;
+    const ws = new WebSocket(wsUrl);
+    wsRef.current = ws;
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === "message") {
+          setMessages((prev) => [...prev, {
+            id: data.id,
+            content: data.content,
+            created_at: data.created_at,
+            is_read: false,
+            sender: {
+              id: data.sender_id,
+              username: data.sender_username,
+              full_name: data.sender_full_name,
+              email: "",
+              bio: null,
+              avatar_url: null,
+              is_verified: false,
+              created_at: data.created_at,
+            },
+            receiver: me!,
+          }]);
+        }
+      } catch {
+        // ignore non-JSON messages
+      }
+    };
+
+    return () => {
+      ws.close();
+      wsRef.current = null;
+    };
+  }, [token, me]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -60,6 +100,10 @@ export default function ConversationPage() {
               <div>
                 <p className="text-sm font-semibold text-gray-900">{other.full_name ?? other.username}</p>
                 <p className="text-xs text-gray-400">@{other.username}</p>
+              </div>
+              <div className="ml-auto flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-green-400" />
+                <span className="text-xs text-gray-500">Online</span>
               </div>
             </div>
           )}

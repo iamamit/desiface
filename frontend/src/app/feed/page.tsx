@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import LeftSidebar from "@/components/LeftSidebar";
 import Navbar from "@/components/Navbar";
@@ -16,6 +16,9 @@ export default function FeedPage() {
   const [content, setContent] = useState("");
   const [posting, setPosting] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     api.get<Post[]>("/posts/feed")
@@ -23,14 +26,37 @@ export default function FeedPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  }
+
+  function removeImage() {
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
   async function handlePost(e: React.FormEvent) {
     e.preventDefault();
-    if (!content.trim()) return;
+    if (!content.trim() && !imageFile) return;
     setPosting(true);
     try {
-      const { data } = await api.post<Post>("/posts", { content });
+      let image_url: string | undefined;
+      if (imageFile) {
+        const form = new FormData();
+        form.append("file", imageFile);
+        const { data } = await api.post<{ url: string }>("/posts/upload", form, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        image_url = data.url;
+      }
+      const { data } = await api.post<Post>("/posts", { content, image_url });
       setPosts((prev) => [data, ...prev]);
       setContent("");
+      removeImage();
     } finally {
       setPosting(false);
     }
@@ -56,7 +82,7 @@ export default function FeedPage() {
 
             {/* Create post */}
             <div className="bg-white rounded-lg border border-[#E0DFDC] p-3">
-              <div className="flex items-center gap-3 mb-3">
+              <div className="flex items-start gap-3 mb-3">
                 {user?.avatar_url ? (
                   <img src={user.avatar_url} alt="" className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
                 ) : (
@@ -69,10 +95,22 @@ export default function FeedPage() {
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     placeholder="Start a post"
-                    rows={content ? 3 : 1}
+                    rows={content || imagePreview ? 3 : 1}
                     className="w-full resize-none text-sm text-gray-700 placeholder-gray-500 border border-[#C0C0C0] rounded-full px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-[#0A66C2] focus:rounded-lg transition-all"
                   />
-                  {content.trim() && (
+                  {imagePreview && (
+                    <div className="relative mt-2 inline-block">
+                      <img src={imagePreview} alt="preview" className="max-h-48 rounded-lg border border-[#E0DFDC] object-cover" />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-black/80"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
+                  {(content.trim() || imagePreview) && (
                     <div className="flex justify-end mt-2">
                       <button
                         type="submit"
@@ -94,12 +132,23 @@ export default function FeedPage() {
                   </svg>
                   Video
                 </button>
-                <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                >
                   <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   Photo
                 </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  className="hidden"
+                  onChange={handleImageSelect}
+                />
                 <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors">
                   <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

@@ -8,6 +8,7 @@ from app.schemas.user import UserPublic
 
 class PostCreate(BaseModel):
     content: str
+    image_url: str | None = None
 
 
 class CommentCreate(BaseModel):
@@ -26,6 +27,7 @@ class CommentOut(BaseModel):
 class PostOut(BaseModel):
     id: uuid.UUID
     content: str
+    image_url: str | None = None
     created_at: datetime
     author: UserPublic
     like_count: int = 0

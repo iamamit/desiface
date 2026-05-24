@@ -1,6 +1,7 @@
+import os
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
@@ -14,6 +15,9 @@ from app.models.user import User
 from app.routers.auth import get_current_user
 from app.schemas.post import CommentCreate, CommentOut, PostCreate, PostOut
 
+UPLOAD_DIR = "/app/uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 router = APIRouter(prefix="/posts", tags=["posts"])
 
 
@@ -24,6 +28,7 @@ def _serialize_post(post: Post, me: User, db: Session) -> PostOut:
     return PostOut(
         id=post.id,
         content=post.content,
+        image_url=post.image_url,
         created_at=post.created_at,
         author=post.author,
         like_count=like_count,
@@ -63,11 +68,30 @@ def get_feed(
     return [_serialize_post(p, current_user, db) for p in posts]
 
 
+@router.post("/upload", response_model=dict)
+async def upload_image(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+):
+    allowed = {"image/jpeg", "image/png", "image/gif", "image/webp"}
+    if file.content_type not in allowed:
+        raise HTTPException(status_code=400, detail="Only JPEG, PNG, GIF, and WebP images are allowed")
+    ext = file.filename.rsplit(".", 1)[-1].lower() if "." in (file.filename or "") else "jpg"
+    filename = f"{uuid.uuid4()}.{ext}"
+    path = os.path.join(UPLOAD_DIR, filename)
+    contents = await file.read()
+    if len(contents) > 10 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large (max 10MB)")
+    with open(path, "wb") as f:
+        f.write(contents)
+    return {"url": f"/uploads/{filename}"}
+
+
 @router.post("", response_model=PostOut, status_code=status.HTTP_201_CREATED)
 def create_post(payload: PostCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    if not payload.content.strip():
+    if not payload.content.strip() and not payload.image_url:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Post content cannot be empty")
-    post = Post(user_id=current_user.id, content=payload.content.strip())
+    post = Post(user_id=current_user.id, content=payload.content.strip(), image_url=payload.image_url)
     db.add(post)
     db.commit()
     db.refresh(post)

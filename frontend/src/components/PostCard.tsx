@@ -118,7 +118,16 @@ export default function PostCard({ post, onDeleted }: Props) {
         </div>
 
         {/* Content */}
-        <p className="mt-3 text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{post.content}</p>
+        {post.content && (
+          <p className="mt-3 text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{post.content}</p>
+        )}
+        {post.image_url && (
+          <img
+            src={`http://localhost:8000${post.image_url}`}
+            alt="post image"
+            className="mt-3 w-full rounded-lg max-h-[500px] object-cover"
+          />
+        )}
 
         {/* Reaction + comment counts */}
         {(likeCount > 0 || commentCount > 0) && (

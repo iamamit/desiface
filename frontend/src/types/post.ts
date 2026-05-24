@@ -3,6 +3,7 @@ import type { User } from "./user";
 export interface Post {
   id: string;
   content: string;
+  image_url?: string | null;
   created_at: string;
   author: User;
   like_count: number;

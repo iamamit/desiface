@@ -4,6 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
 
+from app.routers import ws as ws_router
+
 from app.core.database import get_db
 from app.models.message import Message
 from app.models.user import User
@@ -61,7 +63,7 @@ def get_conversation(user_id: uuid.UUID, current_user: User = Depends(get_curren
 
 
 @router.post("/{user_id}", response_model=MessageOut, status_code=status.HTTP_201_CREATED)
-def send_message(
+async def send_message(
     user_id: uuid.UUID,
     payload: MessageCreate,
     current_user: User = Depends(get_current_user),
@@ -75,4 +77,14 @@ def send_message(
     db.add(msg)
     db.commit()
     db.refresh(msg)
+
+    await ws_router.manager.send_to_user(user_id, {
+        "type": "message",
+        "sender_id": str(current_user.id),
+        "sender_username": current_user.username,
+        "sender_full_name": current_user.full_name or current_user.username,
+        "content": msg.content,
+        "id": str(msg.id),
+        "created_at": msg.created_at.isoformat(),
+    })
     return msg

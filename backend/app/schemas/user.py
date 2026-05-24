@@ -51,6 +51,18 @@ class UserPublic(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class PasswordChange(BaseModel):
+    current_password: str
+    new_password: str
+
+    @field_validator("new_password")
+    @classmethod
+    def password_strength(cls, v: str) -> str:
+        if len(v) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        return v
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
