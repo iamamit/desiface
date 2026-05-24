@@ -80,8 +80,9 @@ export default function SettingsPage() {
           <h2 className="text-base font-semibold text-gray-900 mb-4">Change password</h2>
           <form onSubmit={handlePasswordChange} className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Current password</label>
+              <label htmlFor="current-password" className="block text-sm font-medium text-gray-700 mb-1">Current password</label>
               <input
+                id="current-password"
                 type="password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
@@ -90,8 +91,9 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">New password</label>
+              <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 mb-1">New password</label>
               <input
+                id="new-password"
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
@@ -101,8 +103,9 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Confirm new password</label>
+              <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1">Confirm new password</label>
               <input
+                id="confirm-password"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
