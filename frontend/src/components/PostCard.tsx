@@ -80,7 +80,7 @@ export default function PostCard({ post, onDeleted }: Props) {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-5">
+    <div className="bg-white rounded-2xl shadow-sm p-5" data-testid="post-card">
       {/* Author */}
       <div className="flex items-center justify-between mb-3">
         <Link href={`/profile/${post.author.username}`} className="flex items-center gap-3 group">
@@ -104,14 +104,14 @@ export default function PostCard({ post, onDeleted }: Props) {
 
       {/* Actions */}
       <div className="flex items-center gap-4 mt-4 pt-3 border-t border-gray-50">
-        <button onClick={toggleLike} className={`flex items-center gap-1.5 text-sm transition-colors ${liked ? "text-red-500" : "text-gray-400 hover:text-red-400"}`}>
+        <button data-testid="like-btn" onClick={toggleLike} className={`flex items-center gap-1.5 text-sm transition-colors ${liked ? "text-red-500" : "text-gray-400 hover:text-red-400"}`}>
           <svg className="w-4 h-4" fill={liked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
           {likeCount > 0 && <span>{likeCount}</span>}
         </button>
 
-        <button onClick={loadComments} disabled={loadingComments} className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-blue-400 transition-colors">
+        <button data-testid="comment-btn" onClick={loadComments} disabled={loadingComments} className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-blue-400 transition-colors">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
