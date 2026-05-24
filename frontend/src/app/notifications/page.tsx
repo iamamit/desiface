@@ -31,6 +31,8 @@ function notifIcon(type: string) {
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [acceptedIds, setAcceptedIds] = useState<Set<string>>(new Set());
+  const [ignoredIds, setIgnoredIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     api.get<Notification[]>("/notifications")
@@ -38,6 +40,26 @@ export default function NotificationsPage() {
       .finally(() => setLoading(false));
     api.post("/notifications/read-all").catch(() => {});
   }, []);
+
+  async function acceptRequest(n: Notification) {
+    if (!n.entity_id) return;
+    try {
+      await api.patch(`/connections/${n.entity_id}/accept`);
+      setAcceptedIds((prev) => new Set([...prev, n.id]));
+    } catch {
+      // connection might have been deleted or already accepted
+    }
+  }
+
+  async function ignoreRequest(n: Notification) {
+    if (!n.entity_id) return;
+    try {
+      await api.patch(`/connections/${n.entity_id}/decline`);
+      setIgnoredIds((prev) => new Set([...prev, n.id]));
+    } catch {
+      // ignore silently
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#F3F2EF]">
@@ -90,6 +112,28 @@ export default function NotificationsPage() {
                             minute: "2-digit",
                           })}
                         </p>
+                        {n.type === "connection_request" && !acceptedIds.has(n.id) && !ignoredIds.has(n.id) && (
+                          <div className="flex gap-2 mt-2">
+                            <button
+                              onClick={() => acceptRequest(n)}
+                              className="rounded-full bg-[#0A66C2] px-4 py-1 text-xs font-semibold text-white hover:bg-[#004182] transition-colors"
+                            >
+                              Accept
+                            </button>
+                            <button
+                              onClick={() => ignoreRequest(n)}
+                              className="rounded-full border border-gray-400 px-4 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+                            >
+                              Ignore
+                            </button>
+                          </div>
+                        )}
+                        {n.type === "connection_request" && acceptedIds.has(n.id) && (
+                          <p className="text-xs text-green-600 mt-1 font-medium">Connected ✓</p>
+                        )}
+                        {n.type === "connection_request" && ignoredIds.has(n.id) && (
+                          <p className="text-xs text-gray-400 mt-1">Request ignored</p>
+                        )}
                       </div>
                       {!n.is_read && (
                         <div className="w-2.5 h-2.5 rounded-full bg-[#0A66C2] flex-shrink-0 mt-1.5" />

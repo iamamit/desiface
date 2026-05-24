@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import LeftSidebar from "@/components/LeftSidebar";
 import Navbar from "@/components/Navbar";
 import api from "@/lib/api";
+import { useAuthStore } from "@/store/auth";
 import type { Connection } from "@/types/connection";
 import type { User } from "@/types/user";
 
@@ -17,12 +18,14 @@ function Avatar({ name }: { name: string }) {
 }
 
 export default function ConnectionsPage() {
+  const { user: me } = useAuthStore();
   const [connections, setConnections] = useState<Connection[]>([]);
   const [requests, setRequests] = useState<Connection[]>([]);
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<User[]>([]);
   const [sentIds, setSentIds] = useState<Set<string>>(new Set());
   const [tab, setTab] = useState<"friends" | "requests">("friends");
+  const [acceptError, setAcceptError] = useState<string | null>(null);
 
   useEffect(() => {
     api.get<Connection[]>("/connections").then((r) => setConnections(r.data));
@@ -44,14 +47,23 @@ export default function ConnectionsPage() {
   }
 
   async function accept(connId: string) {
-    const { data } = await api.patch<Connection>(`/connections/${connId}/accept`);
-    setRequests((prev) => prev.filter((r) => r.id !== connId));
-    setConnections((prev) => [data, ...prev]);
+    setAcceptError(null);
+    try {
+      const { data } = await api.patch<Connection>(`/connections/${connId}/accept`);
+      setRequests((prev) => prev.filter((r) => r.id !== connId));
+      setConnections((prev) => [data, ...prev]);
+    } catch {
+      setAcceptError("Failed to accept request. Please try again.");
+    }
   }
 
   async function decline(connId: string) {
-    await api.patch(`/connections/${connId}/decline`);
-    setRequests((prev) => prev.filter((r) => r.id !== connId));
+    try {
+      await api.patch(`/connections/${connId}/decline`);
+      setRequests((prev) => prev.filter((r) => r.id !== connId));
+    } catch {
+      setAcceptError("Failed to ignore request. Please try again.");
+    }
   }
 
   async function unfriend(connId: string) {
@@ -138,7 +150,7 @@ export default function ConnectionsPage() {
                   {connections.length === 0 ? (
                     <div className="p-8 text-center text-sm text-gray-400">No connections yet. Find people above!</div>
                   ) : connections.map((c) => {
-                    const other = c.requester.username === (window as unknown as { __me?: string }).__me ? c.addressee : c.requester;
+                    const other = c.requester.id === me?.id ? c.addressee : c.requester;
                     return (
                       <div key={c.id} className="flex items-center gap-3 px-4 py-3 border-b border-[#E0DFDC] last:border-0 hover:bg-gray-50">
                         <Avatar name={other.full_name ?? other.username} />
@@ -158,6 +170,9 @@ export default function ConnectionsPage() {
               {/* Requests */}
               {tab === "requests" && (
                 <div>
+                  {acceptError && (
+                    <div className="px-4 py-2 bg-red-50 border-b border-red-100 text-sm text-red-500">{acceptError}</div>
+                  )}
                   {requests.length === 0 ? (
                     <div className="p-8 text-center text-sm text-gray-400">No pending requests.</div>
                   ) : requests.map((r) => (
