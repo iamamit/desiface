@@ -57,6 +57,18 @@ Desiface is a LinkedIn-style social network for the South Asian diaspora.
 
 ---
 
+## Development Process
+
+See `PROCESS.md` for full details. Summary:
+
+- **Never commit directly to `main` or `develop`**
+- Create `feature/xxx` or `fix/xxx` branch from `develop`
+- Test on branch → merge to `develop` → run full tests → merge to `main` → deploy
+- Every merge to `develop`: run Playwright tests
+- Every merge to `main`: run Playwright + bot smoke test (20 bots via `desiface-agents`)
+
+---
+
 ## What remains / next steps
 
 - [ ] **Commit everything** — all in-progress changes listed above are done but uncommitted
