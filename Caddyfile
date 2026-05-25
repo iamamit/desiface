@@ -9,35 +9,35 @@
         reverse_proxy backend:8000
     }
 
-    handle /auth/* {
+    handle /auth* {
         reverse_proxy backend:8000
     }
 
-    handle /users/* {
+    handle /users* {
         reverse_proxy backend:8000
     }
 
-    handle /posts/* {
+    handle /posts* {
         reverse_proxy backend:8000
     }
 
-    handle /connections/* {
+    handle /connections* {
         reverse_proxy backend:8000
     }
 
-    handle /notifications/* {
+    handle /notifications* {
         reverse_proxy backend:8000
     }
 
-    handle /messages/* {
+    handle /messages* {
         reverse_proxy backend:8000
     }
 
-    handle /search/* {
+    handle /search* {
         reverse_proxy backend:8000
     }
 
-    handle /uploads/* {
+    handle /uploads* {
         reverse_proxy backend:8000
     }
 
