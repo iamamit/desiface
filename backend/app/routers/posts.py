@@ -29,6 +29,8 @@ def _serialize_post(post: Post, me: User, db: Session) -> PostOut:
         id=post.id,
         content=post.content,
         image_url=post.image_url,
+        visibility=post.visibility,
+        shared_post=post.shared_post,
         created_at=post.created_at,
         author=post.author,
         like_count=like_count,
@@ -59,7 +61,10 @@ def get_feed(
 
     posts = (
         db.query(Post)
-        .filter(Post.user_id.in_(friend_ids))
+        .filter(
+            Post.user_id.in_(friend_ids),
+            or_(Post.visibility == "public", Post.user_id == current_user.id),
+        )
         .order_by(Post.created_at.desc())
         .offset(skip)
         .limit(limit)
@@ -89,9 +94,15 @@ async def upload_image(
 
 @router.post("", response_model=PostOut, status_code=status.HTTP_201_CREATED)
 def create_post(payload: PostCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    if not payload.content.strip() and not payload.image_url:
+    if not payload.content.strip() and not payload.image_url and not payload.shared_post_id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Post content cannot be empty")
-    post = Post(user_id=current_user.id, content=payload.content.strip(), image_url=payload.image_url)
+    post = Post(
+        user_id=current_user.id,
+        content=payload.content.strip(),
+        image_url=payload.image_url,
+        shared_post_id=payload.shared_post_id,
+        visibility=payload.visibility if payload.visibility in ("public", "friends") else "public",
+    )
     db.add(post)
     db.commit()
     db.refresh(post)

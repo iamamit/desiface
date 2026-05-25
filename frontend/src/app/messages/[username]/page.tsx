@@ -49,6 +49,7 @@ export default function ConversationPage() {
               bio: null,
               avatar_url: null,
               is_verified: false,
+              profile_visibility: "public" as const,
               created_at: data.created_at,
             },
             receiver: me!,

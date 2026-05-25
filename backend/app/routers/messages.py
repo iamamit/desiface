@@ -16,6 +16,15 @@ from app.schemas.user import UserPublic
 router = APIRouter(prefix="/messages", tags=["messages"])
 
 
+@router.get("/unread-count")
+def unread_count(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    count = db.query(Message).filter(
+        Message.receiver_id == current_user.id,
+        Message.is_read == False,  # noqa: E712
+    ).count()
+    return {"count": count}
+
+
 @router.get("", response_model=list[ConversationOut])
 def list_conversations(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     msgs = db.query(Message).filter(

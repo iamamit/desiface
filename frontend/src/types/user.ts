@@ -6,6 +6,7 @@ export interface User {
   bio: string | null;
   avatar_url: string | null;
   is_verified: boolean;
+  profile_visibility: "public" | "friends_only";
   created_at: string;
 }
 

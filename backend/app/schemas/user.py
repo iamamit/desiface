@@ -36,6 +36,7 @@ class UserUpdate(BaseModel):
     full_name: str | None = None
     bio: str | None = None
     avatar_url: str | None = None
+    profile_visibility: str | None = None
 
 
 class UserPublic(BaseModel):
@@ -46,6 +47,7 @@ class UserPublic(BaseModel):
     bio: str | None
     avatar_url: str | None
     is_verified: bool
+    profile_visibility: str = "public"
     created_at: datetime
 
     model_config = {"from_attributes": True}

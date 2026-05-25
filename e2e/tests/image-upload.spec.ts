@@ -55,7 +55,7 @@ test.describe("Image uploads", () => {
     await expect(page.locator('img[alt="preview"]')).toBeVisible({ timeout: 3000 });
 
     // Click the × remove button
-    await page.locator('button:has-text("×")').click();
+    await page.getByTestId("remove-image-btn").click();
     await expect(page.locator('img[alt="preview"]')).not.toBeVisible();
 
     fs.unlinkSync(tmpPath);

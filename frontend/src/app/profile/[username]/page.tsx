@@ -17,6 +17,7 @@ export default function ProfilePage() {
   const { user: me } = useAuthStore();
   const [profile, setProfile] = useState<User | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [privateProfile, setPrivateProfile] = useState(false);
   const [editing, setEditing] = useState(false);
   const [connStatus, setConnStatus] = useState<ConnectionStatus | null>(null);
   const [connecting, setConnecting] = useState(false);
@@ -24,15 +25,23 @@ export default function ProfilePage() {
   const isOwner = me?.username === username;
 
   useEffect(() => {
+    let cancelled = false;
     api.get<User>(`/users/${username}`)
       .then((r) => {
+        if (cancelled) return;
         setProfile(r.data);
         if (me && me.username !== username) {
           return api.get<ConnectionStatus>(`/connections/status/${r.data.id}`);
         }
       })
-      .then((r) => r && setConnStatus(r.data))
-      .catch((e) => { if (e.response?.status === 404) setNotFound(true); });
+      .then((r) => { if (!cancelled && r) setConnStatus(r.data); })
+      .catch((e) => {
+        if (cancelled) return;
+        const status = e?.response?.status;
+        if (status === 404) setNotFound(true);
+        else if (status === 403) setPrivateProfile(true);
+      });
+    return () => { cancelled = true; };
   }, [username, me]);
 
   async function handleConnect() {
@@ -78,6 +87,20 @@ export default function ProfilePage() {
     );
   }
 
+  if (privateProfile) {
+    return (
+      <div className="min-h-screen bg-[#F3F2EF]">
+        <Navbar />
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <p className="text-gray-700 font-semibold mb-1">This profile is not visible</p>
+            <p className="text-gray-500 text-sm">@{username}&apos;s profile is only visible to their connections.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!profile) {
     return (
       <div className="min-h-screen bg-[#F3F2EF]">
@@ -115,7 +138,7 @@ export default function ProfilePage() {
                 <div className="flex items-end justify-between -mt-12 mb-3">
                   {profile.avatar_url ? (
                     <img
-                      src={profile.avatar_url}
+                      src={profile.avatar_url.startsWith("http") ? profile.avatar_url : `http://localhost:8000${profile.avatar_url}`}
                       alt={profile.username}
                       className="w-24 h-24 rounded-full border-4 border-white object-cover"
                     />

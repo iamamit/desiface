@@ -7,6 +7,17 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
 
+    # Email (optional — if not set, links are logged to console)
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    FROM_EMAIL: str = "noreply@desiface.com"
+    FRONTEND_URL: str = "http://localhost:3001"
+
+    # Dev mode: return tokens in API responses (disable in production)
+    DEV_MODE: bool = True
+
     class Config:
         env_file = ".env"
 

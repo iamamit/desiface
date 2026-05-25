@@ -48,19 +48,18 @@ export default function Navbar() {
   const pathname = usePathname();
   const { user, logout } = useAuthStore();
   const [unread, setUnread] = useState(0);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<User[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    api.get<{ count: number }>("/notifications/unread-count")
-      .then((r) => setUnread(r.data.count))
-      .catch(() => {});
-    const interval = setInterval(() => {
-      api.get<{ count: number }>("/notifications/unread-count")
-        .then((r) => setUnread(r.data.count))
-        .catch(() => {});
-    }, 30000);
+    const fetchCounts = () => {
+      api.get<{ count: number }>("/notifications/unread-count").then((r) => setUnread(r.data.count)).catch(() => {});
+      api.get<{ count: number }>("/messages/unread-count").then((r) => setUnreadMessages(r.data.count)).catch(() => {});
+    };
+    fetchCounts();
+    const interval = setInterval(fetchCounts, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -152,7 +151,7 @@ export default function Navbar() {
             </svg>
           </NavItem>
 
-          <NavItem href="/messages" label="Messaging" active={pathname.startsWith("/messages")}>
+          <NavItem href="/messages" label="Messaging" unread={unreadMessages} active={pathname.startsWith("/messages")}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>

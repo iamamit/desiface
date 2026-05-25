@@ -9,7 +9,11 @@ import { useAuthStore } from "@/store/auth";
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { logout } = useAuthStore();
+  const { logout, user, fetchMe } = useAuthStore();
+  const [postVisibility, setPostVisibility] = useState<"public" | "friends">("public");
+  const [profileVisibility, setProfileVisibility] = useState<"public" | "friends_only">(user?.profile_visibility ?? "public");
+  const [privacySaving, setPrivacySaving] = useState(false);
+  const [privacySaved, setPrivacySaved] = useState(false);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -17,6 +21,18 @@ export default function SettingsPage() {
   const [pwSaving, setPwSaving] = useState(false);
   const [pwError, setPwError] = useState("");
   const [pwSuccess, setPwSuccess] = useState(false);
+
+  async function savePrivacy() {
+    setPrivacySaving(true);
+    setPrivacySaved(false);
+    try {
+      await api.patch("/users/me", { profile_visibility: profileVisibility });
+      await fetchMe();
+      setPrivacySaved(true);
+    } finally {
+      setPrivacySaving(false);
+    }
+  }
 
   const [deleteConfirm, setDeleteConfirm] = useState("");
   const [deleting, setDeleting] = useState(false);
@@ -123,6 +139,35 @@ export default function SettingsPage() {
               {pwSaving ? "Saving…" : "Save password"}
             </button>
           </form>
+        </div>
+
+        {/* Privacy */}
+        <div className="bg-white rounded-lg border border-[#E0DFDC] p-6">
+          <h2 className="text-base font-semibold text-gray-900 mb-4">Privacy</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Profile visibility</label>
+              <select value={profileVisibility} onChange={(e) => setProfileVisibility(e.target.value as "public" | "friends_only")}
+                className="w-full border border-[#C0C0C0] rounded px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0A66C2]">
+                <option value="public">Public — anyone can view your profile</option>
+                <option value="friends_only">Connections only</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Default post visibility</label>
+              <select value={postVisibility} onChange={(e) => setPostVisibility(e.target.value as "public" | "friends")}
+                className="w-full border border-[#C0C0C0] rounded px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0A66C2]">
+                <option value="public">Public</option>
+                <option value="friends">Connections only</option>
+              </select>
+              <p className="text-xs text-gray-400 mt-1">You can also change visibility per-post when creating.</p>
+            </div>
+            {privacySaved && <p className="text-green-600 text-sm">Privacy settings saved.</p>}
+            <button onClick={savePrivacy} disabled={privacySaving}
+              className="rounded-full bg-[#0A66C2] px-5 py-2 text-sm font-semibold text-white hover:bg-[#004182] disabled:opacity-50 transition-colors">
+              {privacySaving ? "Saving…" : "Save privacy settings"}
+            </button>
+          </div>
         </div>
 
         {/* Danger zone */}
