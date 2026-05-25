@@ -1,3 +1,5 @@
+import sys
+
 from pydantic_settings import BaseSettings
 
 
@@ -15,11 +17,15 @@ class Settings(BaseSettings):
     FROM_EMAIL: str = "noreply@desiface.com"
     FRONTEND_URL: str = "http://localhost:3001"
 
-    # Dev mode: return tokens in API responses (disable in production)
-    DEV_MODE: bool = True
+    # Dev mode: return tokens in API responses — MUST be False in production
+    DEV_MODE: bool = False
 
     class Config:
         env_file = ".env"
 
 
 settings = Settings()
+
+if settings.SECRET_KEY == "change-me-in-production" and not settings.DEV_MODE:
+    print("FATAL: SECRET_KEY is not set. Set it in .env before running in production.", file=sys.stderr)
+    sys.exit(1)

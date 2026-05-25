@@ -7,6 +7,7 @@ import EditProfileModal from "@/components/EditProfileModal";
 import LeftSidebar from "@/components/LeftSidebar";
 import Navbar from "@/components/Navbar";
 import api from "@/lib/api";
+import { mediaUrl } from "@/lib/media";
 import { useAuthStore } from "@/store/auth";
 import type { ConnectionStatus } from "@/types/connection";
 import type { User } from "@/types/user";
@@ -138,7 +139,7 @@ export default function ProfilePage() {
                 <div className="flex items-end justify-between -mt-12 mb-3">
                   {profile.avatar_url ? (
                     <img
-                      src={profile.avatar_url.startsWith("http") ? profile.avatar_url : `http://localhost:8000${profile.avatar_url}`}
+                      src={mediaUrl(profile.avatar_url)!}
                       alt={profile.username}
                       className="w-24 h-24 rounded-full border-4 border-white object-cover"
                     />

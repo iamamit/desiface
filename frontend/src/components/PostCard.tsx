@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import api from "@/lib/api";
+import { mediaUrl } from "@/lib/media";
 import { useAuthStore } from "@/store/auth";
 import type { Comment, Post } from "@/types/post";
 
@@ -39,7 +40,7 @@ function SharedPostEmbed({ post }: { post: Post["shared_post"] }) {
       </div>
       {post.content && <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{post.content}</p>}
       {post.image_url && (
-        <img src={`http://localhost:8000${post.image_url}`} alt="shared post" className="mt-2 w-full rounded-lg max-h-48 object-cover" />
+        <img src={mediaUrl(post.image_url)!} alt="shared post" className="mt-2 w-full rounded-lg max-h-48 object-cover" />
       )}
     </div>
   );
@@ -118,9 +119,7 @@ export default function PostCard({ post, onDeleted, onShared }: Props) {
   const isOwner = user?.id === post.author.id;
   const initials = (post.author.full_name ?? post.author.username).slice(0, 2).toUpperCase();
   const meInitials = user ? (user.full_name ?? user.username).slice(0, 2).toUpperCase() : "";
-  const avatarSrc = post.author.avatar_url
-    ? (post.author.avatar_url.startsWith("http") ? post.author.avatar_url : `http://localhost:8000${post.author.avatar_url}`)
-    : null;
+  const avatarSrc = mediaUrl(post.author.avatar_url);
 
   async function toggleLike() {
     setLiked((prev) => !prev);
@@ -213,7 +212,7 @@ export default function PostCard({ post, onDeleted, onShared }: Props) {
             <p className="mt-3 text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{post.content}</p>
           )}
           {post.image_url && (
-            <img src={`http://localhost:8000${post.image_url}`} alt="post image" className="mt-3 w-full rounded-lg max-h-[500px] object-cover" />
+            <img src={mediaUrl(post.image_url)!} alt="post image" className="mt-3 w-full rounded-lg max-h-[500px] object-cover" />
           )}
           {post.shared_post && <SharedPostEmbed post={post.shared_post} />}
 

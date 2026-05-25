@@ -28,7 +28,8 @@ export default function ConversationPage() {
 
   useEffect(() => {
     if (!token) return;
-    const wsUrl = `ws://localhost:8000/ws?token=${token}`;
+    const wsBase = (process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:8000").replace(/\/$/, "");
+    const wsUrl = `${wsBase}/ws?token=${token}`;
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 

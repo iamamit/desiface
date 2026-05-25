@@ -14,6 +14,7 @@ export default function FeedPage() {
   const { user } = useAuthStore();
   const [posts, setPosts] = useState<Post[]>([]);
   const [dismissedVerify, setDismissedVerify] = useState(false);
+  const [resendStatus, setResendStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [content, setContent] = useState("");
   const [posting, setPosting] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -92,10 +93,19 @@ export default function FeedPage() {
                 </div>
                 <div className="flex items-center gap-3 ml-3">
                   <button
-                    onClick={async () => { await import("@/lib/api").then(m => m.default.post("/auth/resend-verification")); }}
-                    className="text-xs font-semibold text-[#0A66C2] hover:underline whitespace-nowrap"
+                    disabled={resendStatus === "sending" || resendStatus === "sent"}
+                    onClick={async () => {
+                      setResendStatus("sending");
+                      try {
+                        await api.post("/auth/resend-verification");
+                        setResendStatus("sent");
+                      } catch {
+                        setResendStatus("error");
+                      }
+                    }}
+                    className="text-xs font-semibold text-[#0A66C2] hover:underline whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Resend email
+                    {resendStatus === "sending" ? "Sending…" : resendStatus === "sent" ? "Email sent!" : resendStatus === "error" ? "Failed, try again" : "Resend email"}
                   </button>
                   <button onClick={() => setDismissedVerify(true)} className="text-amber-500 hover:text-amber-700 text-lg leading-none">×</button>
                 </div>

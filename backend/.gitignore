@@ -1,0 +1,3 @@
+# Uploaded files — use a Docker volume in production
+uploads/*
+!uploads/.gitkeep

@@ -2,6 +2,10 @@
 .env
 .env.local
 .env.*.local
+.env.production
+backend/.env.production
+frontend/.env.production
+!*.example
 
 # Python
 __pycache__/
@@ -29,3 +33,8 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Test artifacts
+test-results/
+e2e/test-results/
+playwright-report/

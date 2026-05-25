@@ -1,0 +1,51 @@
+# Replace yourdomain.com with your actual domain
+{$DOMAIN} {
+    # Frontend
+    reverse_proxy frontend:3000
+
+    # API routes
+    handle /api/* {
+        uri strip_prefix /api
+        reverse_proxy backend:8000
+    }
+
+    handle /auth/* {
+        reverse_proxy backend:8000
+    }
+
+    handle /users/* {
+        reverse_proxy backend:8000
+    }
+
+    handle /posts/* {
+        reverse_proxy backend:8000
+    }
+
+    handle /connections/* {
+        reverse_proxy backend:8000
+    }
+
+    handle /notifications/* {
+        reverse_proxy backend:8000
+    }
+
+    handle /messages/* {
+        reverse_proxy backend:8000
+    }
+
+    handle /search/* {
+        reverse_proxy backend:8000
+    }
+
+    handle /uploads/* {
+        reverse_proxy backend:8000
+    }
+
+    handle /ws {
+        reverse_proxy backend:8000
+    }
+
+    handle /health {
+        reverse_proxy backend:8000
+    }
+}

@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 
 import api from "@/lib/api";
+import { mediaUrl } from "@/lib/media";
 import { useAuthStore } from "@/store/auth";
 import type { User } from "@/types/user";
 
@@ -20,7 +21,7 @@ export default function EditProfileModal({ profile, onSaved, onClose }: Props) {
     profile_visibility: profile.profile_visibility ?? "public",
   });
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(profile.avatar_url ? `http://localhost:8000${profile.avatar_url}` : null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(mediaUrl(profile.avatar_url));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
