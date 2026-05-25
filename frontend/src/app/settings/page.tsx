@@ -15,12 +15,9 @@ export default function SettingsPage() {
   const [privacySaving, setPrivacySaving] = useState(false);
   const [privacySaved, setPrivacySaved] = useState(false);
 
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [pwSaving, setPwSaving] = useState(false);
-  const [pwError, setPwError] = useState("");
-  const [pwSuccess, setPwSuccess] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   async function savePrivacy() {
     setPrivacySaving(true);
@@ -31,40 +28,6 @@ export default function SettingsPage() {
       setPrivacySaved(true);
     } finally {
       setPrivacySaving(false);
-    }
-  }
-
-  const [deleteConfirm, setDeleteConfirm] = useState("");
-  const [deleting, setDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState("");
-
-  async function handlePasswordChange(e: React.FormEvent) {
-    e.preventDefault();
-    setPwError("");
-    setPwSuccess(false);
-    if (newPassword !== confirmPassword) {
-      setPwError("New passwords do not match");
-      return;
-    }
-    if (newPassword.length < 8) {
-      setPwError("Password must be at least 8 characters");
-      return;
-    }
-    setPwSaving(true);
-    try {
-      await api.patch("/users/me/password", {
-        current_password: currentPassword,
-        new_password: newPassword,
-      });
-      setPwSuccess(true);
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (err: unknown) {
-      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      setPwError(detail || "Failed to change password");
-    } finally {
-      setPwSaving(false);
     }
   }
 
@@ -90,56 +53,6 @@ export default function SettingsPage() {
       <Navbar />
       <div className="max-w-[640px] mx-auto px-4 py-6 space-y-4">
         <h1 className="text-xl font-bold text-gray-900">Settings</h1>
-
-        {/* Change password */}
-        <div className="bg-white rounded-lg border border-[#E0DFDC] p-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Change password</h2>
-          <form onSubmit={handlePasswordChange} className="space-y-3">
-            <div>
-              <label htmlFor="current-password" className="block text-sm font-medium text-gray-700 mb-1">Current password</label>
-              <input
-                id="current-password"
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                required
-                className="w-full border border-[#C0C0C0] rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-[#0A66C2]"
-              />
-            </div>
-            <div>
-              <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 mb-1">New password</label>
-              <input
-                id="new-password"
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-                minLength={8}
-                className="w-full border border-[#C0C0C0] rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-[#0A66C2]"
-              />
-            </div>
-            <div>
-              <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1">Confirm new password</label>
-              <input
-                id="confirm-password"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                className="w-full border border-[#C0C0C0] rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-[#0A66C2]"
-              />
-            </div>
-            {pwError && <p className="text-red-500 text-sm">{pwError}</p>}
-            {pwSuccess && <p className="text-green-600 text-sm">Password changed successfully.</p>}
-            <button
-              type="submit"
-              disabled={pwSaving}
-              className="rounded-full bg-[#0A66C2] px-5 py-2 text-sm font-semibold text-white hover:bg-[#004182] disabled:opacity-50 transition-colors"
-            >
-              {pwSaving ? "Saving…" : "Save password"}
-            </button>
-          </form>
-        </div>
 
         {/* Privacy */}
         <div className="bg-white rounded-lg border border-[#E0DFDC] p-6">

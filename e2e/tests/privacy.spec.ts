@@ -32,24 +32,26 @@ test.describe("Privacy controls", () => {
     const ctx = await browser.newContext();
     const apiPage = await ctx.newPage();
 
-    // Register userA and set profile to friends_only
-    const regA = await apiPage.request.post("http://localhost:8000/auth/register", {
-      data: { email: userA.email, username: userA.username, password: userA.password, full_name: userA.full_name },
-    });
+    // Register userA via OTP and set profile to friends_only
+    const otpA = await apiPage.request.post("http://localhost:8000/auth/request-otp", { data: { email: userA.email } });
+    const { dev_otp: codeA } = await otpA.json();
+    const regA = await apiPage.request.post("http://localhost:8000/auth/verify-otp", { data: { email: userA.email, code: codeA } });
     const tokenA = (await regA.json()).access_token;
+    const meA = await apiPage.request.get("http://localhost:8000/auth/me", { headers: { Authorization: `Bearer ${tokenA}` } });
+    const usernameA = (await meA.json()).username;
     await apiPage.request.patch("http://localhost:8000/users/me", {
       data: { profile_visibility: "friends_only" },
       headers: { Authorization: `Bearer ${tokenA}` },
     });
 
-    // Register userB
-    const regB = await apiPage.request.post("http://localhost:8000/auth/register", {
-      data: { email: userB.email, username: userB.username, password: userB.password, full_name: userB.full_name },
-    });
+    // Register userB via OTP
+    const otpB = await apiPage.request.post("http://localhost:8000/auth/request-otp", { data: { email: userB.email } });
+    const { dev_otp: codeB } = await otpB.json();
+    const regB = await apiPage.request.post("http://localhost:8000/auth/verify-otp", { data: { email: userB.email, code: codeB } });
     const tokenB = (await regB.json()).access_token;
 
     // UserB should get 403 when requesting userA's profile
-    const profileRes = await apiPage.request.get(`http://localhost:8000/users/${userA.username}`, {
+    const profileRes = await apiPage.request.get(`http://localhost:8000/users/${usernameA}`, {
       headers: { Authorization: `Bearer ${tokenB}` },
     });
     expect(profileRes.status()).toBe(403);

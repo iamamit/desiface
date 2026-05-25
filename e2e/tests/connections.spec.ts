@@ -26,7 +26,7 @@ test.describe("Connections", () => {
     await page.goto("/connections");
 
     await page.fill('input[placeholder="Search by name or username…"]', userB.username);
-    await expect(page.locator("text=" + userB.username)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(userB.username, { exact: true }).first()).toBeVisible({ timeout: 5000 });
     await expect(page.getByRole("button", { name: "Connect" })).toBeVisible();
   });
 
@@ -43,7 +43,7 @@ test.describe("Connections", () => {
     await page.goto("/connections");
 
     await page.fill('input[placeholder="Search by name or username…"]', userB.username);
-    await expect(page.locator("text=" + userB.username)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(userB.username, { exact: true }).first()).toBeVisible({ timeout: 5000 });
 
     await page.getByRole("button", { name: "Connect" }).click();
     await expect(page.getByRole("button", { name: "Sent" })).toBeVisible({ timeout: 5000 });
@@ -83,7 +83,7 @@ test.describe("Connections", () => {
     // userB navigates to connections page and accepts
     await pageB.goto("/connections");
     await pageB.getByRole("button", { name: "Requests (1)" }).click();
-    await expect(pageB.locator("text=" + userA.username)).toBeVisible({ timeout: 5000 });
+    await expect(pageB.getByText(userA.username, { exact: true }).first()).toBeVisible({ timeout: 5000 });
     await pageB.getByRole("button", { name: "Accept" }).click();
 
     // userB now sees userA in Friends tab

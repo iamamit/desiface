@@ -66,7 +66,7 @@ test.describe("Messages", () => {
 
     // Navigate to messages list
     await page.goto("/messages");
-    await expect(page.locator("text=" + (userB.full_name ?? userB.username))).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(userB.username, { exact: true }).first()).toBeVisible({ timeout: 5000 });
     await expect(page.locator("text=Hey there!")).toBeVisible();
   });
 
