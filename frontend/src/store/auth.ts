@@ -10,8 +10,8 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isLoading: boolean;
-  register: (email: string, username: string, password: string, full_name?: string) => Promise<void>;
-  login: (email: string, password: string) => Promise<void>;
+  requestOTP: (email: string) => Promise<void>;
+  verifyOTP: (email: string, code: string) => Promise<void>;
   logout: () => void;
   fetchMe: () => Promise<void>;
 }
@@ -23,27 +23,19 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       isLoading: false,
 
-      register: async (email, username, password, full_name) => {
+      requestOTP: async (email) => {
         set({ isLoading: true });
         try {
-          const { data } = await api.post<AuthResponse>("/auth/register", {
-            email, username, password, full_name,
-          });
-          localStorage.setItem("access_token", data.access_token);
-          document.cookie = `access_token=${data.access_token}; path=/; SameSite=Strict`;
-          set({ user: data.user, token: data.access_token });
+          await api.post("/auth/request-otp", { email });
         } finally {
           set({ isLoading: false });
         }
       },
 
-      login: async (email, password) => {
+      verifyOTP: async (email, code) => {
         set({ isLoading: true });
         try {
-          const params = new URLSearchParams({ username: email, password });
-          const { data } = await api.post<AuthResponse>("/auth/login", params, {
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          });
+          const { data } = await api.post<AuthResponse>("/auth/verify-otp", { email, code });
           localStorage.setItem("access_token", data.access_token);
           document.cookie = `access_token=${data.access_token}; path=/; SameSite=Strict`;
           set({ user: data.user, token: data.access_token });

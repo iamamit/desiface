@@ -9,27 +9,42 @@ export function makeUser() {
   return {
     username: `tuser_${id}`,
     email: `tuser_${id}@test.com`,
-    password: "TestPass123!",
     full_name: `Test User ${id}`,
   };
 }
 
-export async function register(page: Page, user: ReturnType<typeof makeUser>) {
-  await page.goto("/register");
-  await page.fill('input[placeholder="Priya Sharma"]', user.full_name);
-  await page.fill('input[placeholder="priya_sharma"]', user.username);
-  await page.fill('input[type="email"]', user.email);
-  await page.fill('input[type="password"]', user.password);
+async function otpSignIn(page: Page, email: string) {
+  // Pre-fetch OTP from backend to capture dev_otp before any UI request
+  const otpResp = await page.request.post("http://localhost:8000/auth/request-otp", {
+    data: { email },
+  });
+  const { dev_otp: otp } = await otpResp.json();
+
+  await page.goto("/login");
+
+  // Mock the frontend's request-otp call so it doesn't invalidate the OTP we just got
+  await page.route("**/auth/request-otp", (route) =>
+    route.fulfill({ status: 200, body: JSON.stringify({ message: "OTP sent", dev_otp: otp }) })
+  );
+
+  await page.fill('input[type="email"]', email);
+  await page.click('button[type="submit"]');
+  await page.waitForSelector('input[inputmode="numeric"]');
+
+  const digits = otp.split("");
+  for (let i = 0; i < digits.length; i++) {
+    await page.locator('input[inputmode="numeric"]').nth(i).fill(digits[i]);
+  }
   await page.click('button[type="submit"]');
   await page.waitForURL("**/feed");
 }
 
+export async function register(page: Page, user: ReturnType<typeof makeUser>) {
+  await otpSignIn(page, user.email);
+}
+
 export async function login(page: Page, user: ReturnType<typeof makeUser>) {
-  await page.goto("/login");
-  await page.fill('input[type="email"]', user.email);
-  await page.fill('input[type="password"]', user.password);
-  await page.click('button[type="submit"]');
-  await page.waitForURL("**/feed");
+  await otpSignIn(page, user.email);
 }
 
 export async function logout(page: Page) {
