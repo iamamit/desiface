@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "next-themes";
 
 import api from "@/lib/api";
 import { useAuthStore } from "@/store/auth";
@@ -26,8 +27,8 @@ function NavItem({
       href={href}
       className={`flex flex-col items-center justify-center px-3 h-full text-xs min-w-[56px] relative border-b-2 transition-colors ${
         active
-          ? "border-black text-black"
-          : "border-transparent text-gray-500 hover:text-black"
+          ? "border-black dark:border-gray-100 text-black dark:text-gray-100"
+          : "border-transparent text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-gray-100"
       }`}
     >
       <div className="relative">
@@ -40,6 +41,39 @@ function NavItem({
       </div>
       <span className="mt-0.5">{label}</span>
     </Link>
+  );
+}
+
+function ThemeToggle() {
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const isDark = mounted && resolvedTheme === "dark";
+
+  return (
+    <button
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      aria-label="Toggle theme"
+      className={`relative flex items-center w-12 h-6 rounded-full transition-colors focus:outline-none flex-shrink-0 ${
+        isDark ? "bg-[var(--accent)]" : "bg-gray-300"
+      }`}
+    >
+      <span
+        className={`absolute left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform flex items-center justify-center ${
+          isDark ? "translate-x-6" : "translate-x-0"
+        }`}
+      >
+        {isDark ? (
+          <svg className="w-3 h-3 text-[var(--accent)]" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" clipRule="evenodd" />
+          </svg>
+        ) : (
+          <svg className="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+          </svg>
+        )}
+      </span>
+    </button>
   );
 }
 
@@ -92,42 +126,42 @@ export default function Navbar() {
   const initials = user ? (user.full_name ?? user.username).slice(0, 2).toUpperCase() : "";
 
   return (
-    <nav className="sticky top-0 z-40 bg-white border-b border-[#E0DFDC] shadow-sm">
+    <nav className="sticky top-0 z-40 bg-white dark:bg-[#1c1c1c] border-b border-[#E0DFDC] dark:border-[#2E2E2E] shadow-sm">
       <div className="max-w-[1080px] mx-auto px-4 flex items-center h-14 gap-2">
         {/* Logo */}
         <Link href="/feed" className="flex-shrink-0">
-          <div className="w-9 h-9 rounded bg-[#0A66C2] flex items-center justify-center">
+          <div className="w-9 h-9 rounded gradient-accent flex items-center justify-center">
             <span className="text-white font-extrabold text-base italic tracking-tight">df</span>
           </div>
         </Link>
 
         {/* Search */}
         <div ref={searchRef} className="relative">
-          <div className="flex items-center bg-[#EEF3F8] rounded px-3 py-2 w-60 gap-2">
-            <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center bg-[var(--accent-light)] dark:bg-[var(--accent-light-dark)] rounded px-3 py-2 w-60 gap-2">
+            <svg className="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search"
-              className="bg-transparent text-sm focus:outline-none w-full text-gray-800 placeholder-gray-500"
+              className="bg-transparent text-sm focus:outline-none w-full text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-500"
             />
           </div>
           {results.length > 0 && (
-            <div className="absolute top-full mt-1 w-72 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
+            <div className="absolute top-full mt-1 w-72 bg-white dark:bg-[#242424] rounded-lg shadow-xl border border-gray-200 dark:border-[#3E3E3E] z-50 overflow-hidden">
               {results.map((u) => (
                 <button
                   key={u.id}
                   onClick={() => { router.push(`/profile/${u.username}`); setResults([]); setSearch(""); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left"
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-[#2E2E2E] text-left"
                 >
-                  <div className="w-10 h-10 rounded-full bg-[#EEF3F8] flex items-center justify-center text-[#0A66C2] text-sm font-bold flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-[var(--accent-light)] dark:bg-[var(--accent-light-dark)] flex items-center justify-center text-[var(--accent)] text-sm font-bold flex-shrink-0">
                     {(u.full_name ?? u.username).slice(0, 2).toUpperCase()}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 truncate">{u.full_name ?? u.username}</p>
-                    <p className="text-xs text-gray-500 truncate">@{u.username}</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{u.full_name ?? u.username}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">@{u.username}</p>
                   </div>
                 </button>
               ))}
@@ -138,7 +172,7 @@ export default function Navbar() {
         <div className="flex-1" />
 
         {/* Nav items */}
-        <div className="flex items-stretch h-14">
+        <div className="flex items-stretch h-14 gap-1">
           <NavItem href="/feed" label="Home" active={pathname === "/feed"}>
             <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
               <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
@@ -163,13 +197,18 @@ export default function Navbar() {
             </svg>
           </NavItem>
 
+          {/* Theme toggle */}
+          <div className="flex items-center px-2">
+            <ThemeToggle />
+          </div>
+
           {/* Divider */}
-          <div className="w-px bg-[#E0DFDC] mx-1 self-stretch my-2" />
+          <div className="w-px bg-[#E0DFDC] dark:bg-[#2E2E2E] mx-1 self-stretch my-2" />
 
           {/* Me dropdown */}
           {user && (
-            <div className="relative group flex flex-col items-center justify-center px-3 cursor-pointer text-gray-500 hover:text-black min-w-[56px]">
-              <div className="w-7 h-7 rounded-full bg-[#0A66C2] flex items-center justify-center text-white text-xs font-bold">
+            <div className="relative group flex flex-col items-center justify-center px-3 cursor-pointer text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-gray-100 min-w-[56px]">
+              <div className="w-7 h-7 rounded-full bg-[var(--accent)] flex items-center justify-center text-white text-xs font-bold">
                 {initials}
               </div>
               <span className="text-xs mt-0.5 flex items-center gap-0.5">
@@ -179,35 +218,35 @@ export default function Navbar() {
                 </svg>
               </span>
 
-              <div className="absolute right-0 top-full w-60 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden hidden group-hover:block">
+              <div className="absolute right-0 top-full w-60 bg-white dark:bg-[#242424] rounded-lg shadow-xl border border-gray-200 dark:border-[#3E3E3E] overflow-hidden hidden group-hover:block">
                 <div className="p-4 flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-full bg-[#0A66C2] flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                  <div className="w-14 h-14 rounded-full bg-[var(--accent)] flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                     {initials}
                   </div>
                   <div className="min-w-0">
-                    <p className="font-semibold text-sm text-gray-900 truncate">{user.full_name ?? user.username}</p>
-                    <p className="text-xs text-gray-500 truncate">@{user.username}</p>
+                    <p className="font-semibold text-sm text-gray-900 dark:text-gray-100 truncate">{user.full_name ?? user.username}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">@{user.username}</p>
                   </div>
                 </div>
                 <div className="px-4 pb-4">
                   <Link
                     href={`/profile/${user.username}`}
-                    className="block text-center text-sm font-semibold text-[#0A66C2] border border-[#0A66C2] rounded-full py-1.5 hover:bg-[#EEF3F8] transition-colors"
+                    className="block text-center text-sm font-semibold text-[var(--accent)] border border-[var(--accent)] rounded-full py-1.5 hover:bg-[var(--accent-light)] dark:hover:bg-[var(--accent-light-dark)] transition-colors"
                   >
                     View Profile
                   </Link>
                 </div>
-                <div className="border-t border-[#E0DFDC] py-2">
-                  <p className="text-xs font-semibold text-gray-500 px-4 mb-1">Account</p>
+                <div className="border-t border-[#E0DFDC] dark:border-[#3E3E3E] py-2">
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 px-4 mb-1">Account</p>
                   <Link
                     href="/settings"
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2E2E2E]"
                   >
                     Settings
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2E2E2E]"
                   >
                     Sign Out
                   </button>

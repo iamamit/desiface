@@ -69,27 +69,27 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-[#111111] flex flex-col">
       <div className="px-6 py-4">
-        <div className="w-10 h-10 rounded bg-[#0A66C2] flex items-center justify-center">
+        <div className="w-10 h-10 rounded bg-[var(--accent)] flex items-center justify-center">
           <span className="text-white font-extrabold text-base italic">df</span>
         </div>
       </div>
 
       <div className="flex flex-1 items-start justify-start max-w-[1080px] mx-auto w-full px-6 pt-8 gap-20">
         <div className="hidden lg:flex flex-col pt-12 max-w-sm">
-          <h1 className="text-4xl font-light text-[#0A66C2] leading-tight">
+          <h1 className="text-4xl font-light text-[var(--accent)] leading-tight">
             Welcome to your professional community
           </h1>
         </div>
 
         <div className="w-full max-w-sm">
-          <div className="bg-white rounded-xl shadow-md p-8">
+          <div className="bg-white dark:bg-[#1c1c1c] rounded-xl shadow-md dark:shadow-none dark:border dark:border-[#2E2E2E] p-8">
 
             {step === "email" ? (
               <>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-2">Sign in</h2>
-                <p className="text-sm text-gray-500 mb-6">
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Sign in</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
                   Enter your email and we'll send you a sign-in code.
                 </p>
 
@@ -101,14 +101,14 @@ export default function LoginPage() {
 
                 <form onSubmit={handleEmailSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                     <input
                       type="email"
                       required
                       autoFocus
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full rounded border border-gray-400 px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#0A66C2] focus:border-[#0A66C2]"
+                      className="w-full rounded border border-gray-400 dark:border-[#3E3E3E] bg-white dark:bg-[#1A1A1A] text-gray-900 dark:text-gray-100 px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--accent)] focus:border-[var(--accent)]"
                       placeholder="you@example.com"
                     />
                   </div>
@@ -116,7 +116,7 @@ export default function LoginPage() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full rounded-full bg-[#0A66C2] px-4 py-3 text-sm font-semibold text-white hover:bg-[#004182] disabled:opacity-60 transition-colors"
+                    className="w-full rounded-full gradient-accent px-4 py-3 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60 transition-colors"
                   >
                     {isLoading ? "Sending…" : "Continue with email"}
                   </button>
@@ -124,16 +124,16 @@ export default function LoginPage() {
 
                 <div className="relative my-5">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300" />
+                    <div className="w-full border-t border-gray-300 dark:border-[#2E2E2E]" />
                   </div>
                   <div className="relative flex justify-center">
-                    <span className="bg-white px-3 text-xs text-gray-500">or</span>
+                    <span className="bg-white dark:bg-[#1c1c1c] px-3 text-xs text-gray-500 dark:text-gray-400">or</span>
                   </div>
                 </div>
 
                 <button
                   disabled
-                  className="w-full flex items-center justify-center gap-3 rounded border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-500 cursor-not-allowed opacity-60"
+                  className="w-full flex items-center justify-center gap-3 rounded border border-gray-300 dark:border-[#3E3E3E] px-4 py-2.5 text-sm font-medium text-gray-500 dark:text-gray-500 cursor-not-allowed opacity-60"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -149,14 +149,14 @@ export default function LoginPage() {
               <>
                 <button
                   onClick={() => { setStep("email"); setOtp(["", "", "", "", "", ""]); setError(""); }}
-                  className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4"
+                  className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-4"
                 >
                   ← Back
                 </button>
 
-                <h2 className="text-2xl font-semibold text-gray-900 mb-2">Check your email</h2>
-                <p className="text-sm text-gray-500 mb-6">
-                  We sent a 6-digit code to <span className="font-medium text-gray-700">{email}</span>
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Check your email</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                  We sent a 6-digit code to <span className="font-medium text-gray-700 dark:text-gray-300">{email}</span>
                 </p>
 
                 {error && (
@@ -178,7 +178,7 @@ export default function LoginPage() {
                         autoFocus={i === 0}
                         onChange={(e) => handleOTPChange(i, e.target.value)}
                         onKeyDown={(e) => handleOTPKeyDown(i, e)}
-                        className="w-11 h-12 text-center text-xl font-semibold rounded border border-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-[#0A66C2]"
+                        className="w-11 h-12 text-center text-xl font-semibold rounded border border-gray-400 dark:border-[#3E3E3E] bg-white dark:bg-[#1A1A1A] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-[var(--accent)]"
                       />
                     ))}
                   </div>
@@ -186,18 +186,18 @@ export default function LoginPage() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full rounded-full bg-[#0A66C2] px-4 py-3 text-sm font-semibold text-white hover:bg-[#004182] disabled:opacity-60 transition-colors"
+                    className="w-full rounded-full gradient-accent px-4 py-3 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60 transition-colors"
                   >
                     {isLoading ? "Verifying…" : "Verify code"}
                   </button>
                 </form>
 
-                <p className="mt-4 text-center text-sm text-gray-500">
+                <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
                   Didn't receive it?{" "}
                   <button
                     onClick={() => handleEmailSubmit({ preventDefault: () => {} })}
                     disabled={isLoading}
-                    className="text-[#0A66C2] font-medium hover:underline disabled:opacity-60"
+                    className="text-[var(--accent)] font-medium hover:underline disabled:opacity-60"
                   >
                     Resend code
                   </button>

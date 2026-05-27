@@ -18,7 +18,7 @@ export default function MessagesPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F3F2EF]">
+    <div className="min-h-screen bg-[var(--bg-base)]">
       <Navbar />
       <div className="max-w-[1080px] mx-auto px-4 py-4">
         <div className="bg-white rounded-lg border border-[#E0DFDC] overflow-hidden">
@@ -31,7 +31,7 @@ export default function MessagesPage() {
 
           {loading ? (
             <div className="flex justify-center py-10">
-              <div className="w-7 h-7 border-4 border-[#0A66C2] border-t-transparent rounded-full animate-spin" />
+              <div className="w-7 h-7 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
             </div>
           ) : conversations.length === 0 ? (
             <div className="p-8 text-center text-sm text-gray-400">
@@ -45,7 +45,7 @@ export default function MessagesPage() {
                   href={`/messages/${c.user.username}`}
                   className="flex items-center gap-3 px-4 py-3 border-b border-[#E0DFDC] last:border-0 hover:bg-gray-50 transition-colors"
                 >
-                  <div className="w-12 h-12 rounded-full bg-[#EEF3F8] flex items-center justify-center text-[#0A66C2] font-bold text-sm flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-[var(--accent-light)] flex items-center justify-center text-[var(--accent)] font-bold text-sm flex-shrink-0">
                     {(c.user.full_name ?? c.user.username).slice(0, 2).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -58,7 +58,7 @@ export default function MessagesPage() {
                     <div className="flex items-center justify-between mt-0.5">
                       <p className="text-xs text-gray-500 truncate">{c.last_message}</p>
                       {c.unread_count > 0 && (
-                        <span className="ml-2 bg-[#0A66C2] text-white text-[10px] rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-bold flex-shrink-0 px-1">
+                        <span className="ml-2 bg-[var(--accent)] text-white text-[10px] rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-bold flex-shrink-0 px-1">
                           {c.unread_count}
                         </span>
                       )}

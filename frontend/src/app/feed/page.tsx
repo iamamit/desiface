@@ -68,7 +68,7 @@ export default function FeedPage() {
   const initials = user ? (user.full_name ?? user.username).slice(0, 2).toUpperCase() : "";
 
   return (
-    <div className="min-h-screen bg-[#F3F2EF]">
+    <div className="min-h-screen bg-[var(--bg-base)] dark:bg-[#111111]">
       <Navbar />
       <div className="max-w-[1080px] mx-auto px-4 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr_300px] gap-4">
@@ -103,7 +103,7 @@ export default function FeedPage() {
                         setResendStatus("error");
                       }
                     }}
-                    className="text-xs font-semibold text-[#0A66C2] hover:underline whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="text-xs font-semibold text-[var(--accent)] hover:underline whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {resendStatus === "sending" ? "Sending…" : resendStatus === "sent" ? "Email sent!" : resendStatus === "error" ? "Failed, try again" : "Resend email"}
                   </button>
@@ -113,12 +113,12 @@ export default function FeedPage() {
             )}
 
             {/* Create post */}
-            <div className="bg-white rounded-lg border border-[#E0DFDC] p-3">
+            <div className="bg-white dark:bg-[#1c1c1c] rounded-lg border border-[#E0DFDC] dark:border-[#2E2E2E] p-3">
               <div className="flex items-start gap-3 mb-3">
                 {user?.avatar_url ? (
                   <img src={user.avatar_url} alt="" className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-[#0A66C2] flex items-center justify-center text-white font-bold flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-[var(--accent)] flex items-center justify-center text-white font-bold flex-shrink-0">
                     {initials}
                   </div>
                 )}
@@ -128,7 +128,7 @@ export default function FeedPage() {
                     onChange={(e) => setContent(e.target.value)}
                     placeholder="Start a post"
                     rows={content || imagePreview ? 3 : 1}
-                    className="w-full resize-none text-sm text-gray-700 placeholder-gray-500 border border-[#C0C0C0] rounded-full px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-[#0A66C2] focus:rounded-lg transition-all"
+                    className="w-full resize-none text-sm text-gray-700 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-500 bg-transparent border border-[#C0C0C0] dark:border-[#3E3E3E] rounded-full px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-[var(--accent)] focus:rounded-lg transition-all"
                   />
                   {imagePreview && (
                     <div className="relative mt-2 inline-block">
@@ -148,7 +148,7 @@ export default function FeedPage() {
                       <select
                         value={visibility}
                         onChange={(e) => setVisibility(e.target.value as "public" | "friends")}
-                        className="text-xs border border-gray-300 rounded-full px-3 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-[#0A66C2]"
+                        className="text-xs border border-gray-300 dark:border-[#3E3E3E] rounded-full px-3 py-1 bg-white dark:bg-[#1A1A1A] text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                       >
                         <option value="public">🌐 Public</option>
                         <option value="friends">👥 Connections</option>
@@ -156,7 +156,7 @@ export default function FeedPage() {
                       <button
                         type="submit"
                         disabled={posting}
-                        className="rounded-full bg-[#0A66C2] px-5 py-1.5 text-sm font-semibold text-white hover:bg-[#004182] disabled:opacity-50 transition-colors"
+                        className="rounded-full gradient-accent px-5 py-1.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50 transition-colors"
                       >
                         {posting ? "Posting…" : "Post"}
                       </button>
@@ -166,8 +166,8 @@ export default function FeedPage() {
               </div>
 
               {/* Action shortcuts */}
-              <div className="flex items-center gap-1 border-t border-[#E0DFDC] pt-2">
-                <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors">
+              <div className="flex items-center gap-1 border-t border-[#E0DFDC] dark:border-[#2E2E2E] pt-2">
+                <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2A2A2A] rounded transition-colors">
                   <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M15 10l4.553-2.069A1 1 0 0121 8.868V15.13a1 1 0 01-1.447.899L15 14M3 8h12a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V9a1 1 0 011-1z" />
                   </svg>
@@ -176,7 +176,7 @@ export default function FeedPage() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2A2A2A] rounded transition-colors"
                 >
                   <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -201,9 +201,9 @@ export default function FeedPage() {
 
             {/* Sort bar */}
             {posts.length > 0 && (
-              <div className="bg-white rounded-lg border border-[#E0DFDC] px-4 py-2 flex items-center gap-2">
-                <span className="text-xs text-gray-500">Sort by:</span>
-                <button className="text-xs font-semibold text-gray-700 flex items-center gap-1">
+              <div className="bg-white dark:bg-[#1c1c1c] rounded-lg border border-[#E0DFDC] dark:border-[#2E2E2E] px-4 py-2 flex items-center gap-2">
+                <span className="text-xs text-gray-500 dark:text-gray-400">Sort by:</span>
+                <button className="text-xs font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1">
                   Top
                   <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -215,11 +215,11 @@ export default function FeedPage() {
             {/* Feed */}
             {loading ? (
               <div className="flex justify-center py-10">
-                <div className="w-7 h-7 border-4 border-[#0A66C2] border-t-transparent rounded-full animate-spin" />
+                <div className="w-7 h-7 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
               </div>
             ) : posts.length === 0 ? (
-              <div className="bg-white rounded-lg border border-[#E0DFDC] p-8 text-center">
-                <p className="text-gray-500 text-sm">No posts yet. Connect with people or be the first to post!</p>
+              <div className="bg-white dark:bg-[#1c1c1c] rounded-lg border border-[#E0DFDC] dark:border-[#2E2E2E] p-8 text-center">
+                <p className="text-gray-500 dark:text-gray-400 text-sm">No posts yet. Connect with people or be the first to post!</p>
               </div>
             ) : (
               posts.map((p) => (

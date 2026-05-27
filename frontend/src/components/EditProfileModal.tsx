@@ -89,7 +89,7 @@ export default function EditProfileModal({ profile, onSaved, onClose }: Props) {
               {avatarPreview ? (
                 <img src={avatarPreview} alt="avatar" className="w-20 h-20 rounded-full object-cover border-2 border-[#E0DFDC]" />
               ) : (
-                <div className="w-20 h-20 rounded-full bg-[#0A66C2] flex items-center justify-center text-white font-bold text-2xl">
+                <div className="w-20 h-20 rounded-full bg-[var(--accent)] flex items-center justify-center text-white font-bold text-2xl">
                   {initials}
                 </div>
               )}
@@ -102,7 +102,7 @@ export default function EditProfileModal({ profile, onSaved, onClose }: Props) {
             </div>
             <div>
               <p className="text-sm font-semibold text-gray-700">Profile photo</p>
-              <button type="button" onClick={() => fileRef.current?.click()} className="text-xs text-[#0A66C2] hover:underline mt-0.5">
+              <button type="button" onClick={() => fileRef.current?.click()} className="text-xs text-[var(--accent)] hover:underline mt-0.5">
                 {avatarPreview ? "Change photo" : "Upload photo"}
               </button>
               <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden" onChange={handleAvatarSelect} data-testid="avatar-input" />
@@ -112,21 +112,21 @@ export default function EditProfileModal({ profile, onSaved, onClose }: Props) {
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Full name</label>
             <input type="text" value={form.full_name} onChange={update("full_name")}
-              className="w-full rounded border border-gray-400 px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#0A66C2] focus:border-[#0A66C2]"
+              className="w-full rounded border border-gray-400 px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--accent)] focus:border-[var(--accent)]"
               placeholder="Your name" />
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Bio</label>
             <textarea value={form.bio} onChange={update("bio")} rows={3}
-              className="w-full rounded border border-gray-400 px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#0A66C2] focus:border-[#0A66C2] resize-none"
+              className="w-full rounded border border-gray-400 px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--accent)] focus:border-[var(--accent)] resize-none"
               placeholder="Tell people a little about yourself" />
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Profile visibility</label>
             <select value={form.profile_visibility} onChange={update("profile_visibility")}
-              className="w-full rounded border border-gray-400 px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#0A66C2] focus:border-[#0A66C2] bg-white">
+              className="w-full rounded border border-gray-400 px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--accent)] focus:border-[var(--accent)] bg-white">
               <option value="public">Public — anyone can see your profile</option>
               <option value="friends_only">Connections only</option>
             </select>
@@ -138,7 +138,7 @@ export default function EditProfileModal({ profile, onSaved, onClose }: Props) {
               Cancel
             </button>
             <button type="submit" disabled={saving}
-              className="rounded-full bg-[#0A66C2] px-5 py-1.5 text-sm font-semibold text-white hover:bg-[#004182] disabled:opacity-60 transition-colors">
+              className="rounded-full gradient-accent px-5 py-1.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60 transition-colors">
               {saving ? "Saving…" : "Save"}
             </button>
           </div>
