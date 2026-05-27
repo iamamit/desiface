@@ -62,7 +62,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F3F2EF]">
+    <div className="min-h-screen bg-[var(--bg-base)]">
       <Navbar />
       <div className="max-w-[1080px] mx-auto px-4 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-4">
@@ -81,7 +81,7 @@ export default function NotificationsPage() {
 
               {loading ? (
                 <div className="flex justify-center py-10">
-                  <div className="w-7 h-7 border-4 border-[#0A66C2] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-7 h-7 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : notifications.length === 0 ? (
                 <div className="p-8 text-center text-sm text-gray-400">No notifications yet.</div>
@@ -91,11 +91,11 @@ export default function NotificationsPage() {
                     <div
                       key={n.id}
                       className={`flex items-start gap-4 px-4 py-3 border-b border-[#E0DFDC] last:border-0 hover:bg-gray-50 ${
-                        !n.is_read ? "bg-[#EEF3F8]" : ""
+                        !n.is_read ? "bg-[var(--accent-light)]" : ""
                       }`}
                     >
                       <div className="relative flex-shrink-0">
-                        <div className="w-12 h-12 rounded-full bg-[#EEF3F8] flex items-center justify-center text-[#0A66C2] font-bold text-sm">
+                        <div className="w-12 h-12 rounded-full bg-[var(--accent-light)] flex items-center justify-center text-[var(--accent)] font-bold text-sm">
                           {(n.actor.full_name ?? n.actor.username).slice(0, 2).toUpperCase()}
                         </div>
                         <span className="absolute -bottom-0.5 -right-0.5 text-base">
@@ -116,7 +116,7 @@ export default function NotificationsPage() {
                           <div className="flex gap-2 mt-2">
                             <button
                               onClick={() => acceptRequest(n)}
-                              className="rounded-full bg-[#0A66C2] px-4 py-1 text-xs font-semibold text-white hover:bg-[#004182] transition-colors"
+                              className="rounded-full gradient-accent px-4 py-1 text-xs font-semibold text-white hover:opacity-90 transition-colors"
                             >
                               Accept
                             </button>
@@ -136,7 +136,7 @@ export default function NotificationsPage() {
                         )}
                       </div>
                       {!n.is_read && (
-                        <div className="w-2.5 h-2.5 rounded-full bg-[#0A66C2] flex-shrink-0 mt-1.5" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-[var(--accent)] flex-shrink-0 mt-1.5" />
                       )}
                     </div>
                   ))}

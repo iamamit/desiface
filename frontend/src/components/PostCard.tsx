@@ -28,17 +28,17 @@ function SharedPostEmbed({ post }: { post: Post["shared_post"] }) {
   if (!post) return null;
   const initials = (post.author.full_name ?? post.author.username).slice(0, 2).toUpperCase();
   return (
-    <div className="mt-3 border border-[#E0DFDC] rounded-lg p-3 bg-[#F9F9F9]">
+    <div className="mt-3 border border-[#E0DFDC] dark:border-[#2E2E2E] rounded-lg p-3 bg-[#F9F9F9] dark:bg-[#252525]">
       <div className="flex items-center gap-2 mb-2">
-        <div className="w-8 h-8 rounded-full bg-[#EEF3F8] flex items-center justify-center text-[#0A66C2] text-xs font-bold flex-shrink-0">
+        <div className="w-8 h-8 rounded-full bg-[var(--accent-light)] dark:bg-[var(--accent-light-dark)] flex items-center justify-center text-[var(--accent)] text-xs font-bold flex-shrink-0">
           {initials}
         </div>
         <div>
-          <p className="text-xs font-semibold text-gray-800">{post.author.full_name ?? post.author.username}</p>
-          <p className="text-xs text-gray-400">{timeAgo(post.created_at)}</p>
+          <p className="text-xs font-semibold text-gray-800 dark:text-gray-200">{post.author.full_name ?? post.author.username}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500">{timeAgo(post.created_at)}</p>
         </div>
       </div>
-      {post.content && <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{post.content}</p>}
+      {post.content && <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{post.content}</p>}
       {post.image_url && (
         <img src={mediaUrl(post.image_url)!} alt="shared post" className="mt-2 w-full rounded-lg max-h-48 object-cover" />
       )}
@@ -68,10 +68,10 @@ function ShareModal({ post, onClose, onShared }: { post: Post; onClose: () => vo
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-2xl overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#E0DFDC]">
-          <h3 className="text-base font-semibold text-gray-900">Share post</h3>
-          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-full text-lg">×</button>
+      <div className="w-full max-w-md bg-white dark:bg-[#1c1c1c] rounded-xl shadow-2xl overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#E0DFDC] dark:border-[#2E2E2E]">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">Share post</h3>
+          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2E2E2E] rounded-full text-lg">×</button>
         </div>
         <div className="px-5 py-4 space-y-3">
           <textarea
@@ -79,23 +79,23 @@ function ShareModal({ post, onClose, onShared }: { post: Post; onClose: () => vo
             onChange={(e) => setCaption(e.target.value)}
             placeholder="Say something about this…"
             rows={3}
-            className="w-full resize-none text-sm text-gray-700 border border-[#C0C0C0] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0A66C2]"
+            className="w-full resize-none text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-[#1A1A1A] border border-[#C0C0C0] dark:border-[#3E3E3E] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] placeholder-gray-400 dark:placeholder-gray-600"
           />
           <select
             value={visibility}
             onChange={(e) => setVisibility(e.target.value as "public" | "friends")}
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#0A66C2]"
+            className="w-full rounded border border-gray-300 dark:border-[#3E3E3E] px-3 py-2 text-sm bg-white dark:bg-[#1A1A1A] text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
           >
             <option value="public">Public</option>
             <option value="friends">Connections only</option>
           </select>
-          <div className="border border-[#E0DFDC] rounded-lg p-3 bg-[#F9F9F9] text-sm text-gray-600 truncate">
+          <div className="border border-[#E0DFDC] dark:border-[#2E2E2E] rounded-lg p-3 bg-[#F9F9F9] dark:bg-[#252525] text-sm text-gray-600 dark:text-gray-400 truncate">
             Sharing: {post.author.full_name ?? post.author.username}&apos;s post
           </div>
         </div>
         <div className="px-5 pb-4 flex justify-end gap-2">
-          <button onClick={onClose} className="rounded-full border border-gray-400 px-4 py-1.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">Cancel</button>
-          <button onClick={share} disabled={sharing} className="rounded-full bg-[#0A66C2] px-4 py-1.5 text-sm font-semibold text-white hover:bg-[#004182] disabled:opacity-50">
+          <button onClick={onClose} className="rounded-full border border-gray-400 dark:border-gray-600 px-4 py-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2E2E2E]">Cancel</button>
+          <button onClick={share} disabled={sharing} className="rounded-full gradient-accent px-4 py-1.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50">
             {sharing ? "Sharing…" : "Share"}
           </button>
         </div>
@@ -166,7 +166,7 @@ export default function PostCard({ post, onDeleted, onShared }: Props) {
 
   return (
     <>
-      <div className="bg-white rounded-lg border border-[#E0DFDC] overflow-hidden" data-testid="post-card">
+      <div className="bg-white dark:bg-[#1c1c1c] rounded-lg border border-[#E0DFDC] dark:border-[#2E2E2E] overflow-hidden" data-testid="post-card">
         {/* Author header */}
         <div className="p-4">
           <div className="flex items-start justify-between">
@@ -174,16 +174,16 @@ export default function PostCard({ post, onDeleted, onShared }: Props) {
               {avatarSrc ? (
                 <img src={avatarSrc} alt={post.author.username} className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
               ) : (
-                <div className="w-12 h-12 rounded-full bg-[#EEF3F8] flex items-center justify-center text-[#0A66C2] text-sm font-bold flex-shrink-0 group-hover:opacity-90">
+                <div className="w-12 h-12 rounded-full bg-[var(--accent-light)] dark:bg-[var(--accent-light-dark)] flex items-center justify-center text-[var(--accent)] text-sm font-bold flex-shrink-0 group-hover:opacity-90">
                   {initials}
                 </div>
               )}
               <div>
-                <p className="text-sm font-semibold text-gray-900 group-hover:underline">
+                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 group-hover:underline">
                   {post.author.full_name ?? post.author.username}
                 </p>
-                <p className="text-xs text-gray-500">@{post.author.username}</p>
-                <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
+                <p className="text-xs text-gray-500 dark:text-gray-400">@{post.author.username}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1 mt-0.5">
                   {timeAgo(post.created_at)}
                   <span>·</span>
                   {post.visibility === "friends" ? (
@@ -209,7 +209,7 @@ export default function PostCard({ post, onDeleted, onShared }: Props) {
 
           {/* Content */}
           {post.content && (
-            <p className="mt-3 text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{post.content}</p>
+            <p className="mt-3 text-sm text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">{post.content}</p>
           )}
           {post.image_url && (
             <img src={mediaUrl(post.image_url)!} alt="post image" className="mt-3 w-full rounded-lg max-h-[500px] object-cover" />
@@ -218,10 +218,10 @@ export default function PostCard({ post, onDeleted, onShared }: Props) {
 
           {/* Reaction + comment counts */}
           {(likeCount > 0 || commentCount > 0) && (
-            <div className="flex items-center justify-between mt-3 pt-2 text-xs text-gray-500">
+            <div className="flex items-center justify-between mt-3 pt-2 text-xs text-gray-500 dark:text-gray-400">
               {likeCount > 0 && (
                 <span className="flex items-center gap-1">
-                  <span className="w-4 h-4 rounded-full bg-[#0A66C2] flex items-center justify-center">
+                  <span className="w-4 h-4 rounded-full bg-[var(--accent)] flex items-center justify-center">
                     <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
                     </svg>
@@ -239,11 +239,11 @@ export default function PostCard({ post, onDeleted, onShared }: Props) {
         </div>
 
         {/* Action buttons */}
-        <div className="flex border-t border-[#E0DFDC] mx-4 mb-1">
+        <div className="flex border-t border-[#E0DFDC] dark:border-[#2E2E2E] mx-4 mb-1">
           <button
             data-testid="like-btn"
             onClick={toggleLike}
-            className={`flex flex-1 items-center justify-center gap-1.5 py-2.5 text-sm font-semibold rounded hover:bg-gray-100 transition-colors ${liked ? "text-[#0A66C2]" : "text-gray-600"}`}
+            className={`flex flex-1 items-center justify-center gap-1.5 py-2.5 text-sm font-semibold rounded hover:bg-gray-100 dark:hover:bg-[#2A2A2A] transition-colors ${liked ? "text-[var(--accent)]" : "text-gray-600 dark:text-gray-400"}`}
           >
             <svg className="w-5 h-5" fill={liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth={liked ? 0 : 1.5} viewBox="0 0 24 24">
               <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
@@ -256,7 +256,7 @@ export default function PostCard({ post, onDeleted, onShared }: Props) {
             data-testid="comment-btn"
             onClick={loadComments}
             disabled={loadingComments}
-            className="flex flex-1 items-center justify-center gap-1.5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors"
+            className="flex flex-1 items-center justify-center gap-1.5 py-2.5 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2A2A2A] rounded transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
@@ -268,7 +268,7 @@ export default function PostCard({ post, onDeleted, onShared }: Props) {
           <button
             data-testid="share-btn"
             onClick={() => setShowShareModal(true)}
-            className="flex flex-1 items-center justify-center gap-1.5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors"
+            className="flex flex-1 items-center justify-center gap-1.5 py-2.5 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2A2A2A] rounded transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -276,7 +276,7 @@ export default function PostCard({ post, onDeleted, onShared }: Props) {
             <span className="hidden sm:inline">Repost</span>
           </button>
 
-          <button className="flex flex-1 items-center justify-center gap-1.5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors">
+          <button className="flex flex-1 items-center justify-center gap-1.5 py-2.5 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2A2A2A] rounded transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
             </svg>
@@ -286,30 +286,30 @@ export default function PostCard({ post, onDeleted, onShared }: Props) {
 
         {/* Comments */}
         {showComments && (
-          <div className="px-4 pb-4 space-y-3 border-t border-[#E0DFDC] pt-3">
+          <div className="px-4 pb-4 space-y-3 border-t border-[#E0DFDC] dark:border-[#2E2E2E] pt-3">
             {comments.map((c) => (
               <div key={c.id} className="flex gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-[#EEF3F8] flex items-center justify-center text-[#0A66C2] text-xs font-bold flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-[var(--accent-light)] dark:bg-[var(--accent-light-dark)] flex items-center justify-center text-[var(--accent)] text-xs font-bold flex-shrink-0">
                   {(c.author.full_name ?? c.author.username).slice(0, 2).toUpperCase()}
                 </div>
-                <div className="bg-[#F3F2EF] rounded-lg px-3 py-2 flex-1">
-                  <p className="text-xs font-semibold text-gray-800">{c.author.full_name ?? c.author.username}</p>
-                  <p className="text-xs text-gray-700 mt-0.5">{c.content}</p>
+                <div className="bg-[var(--bg-base)] dark:bg-[#252525] rounded-lg px-3 py-2 flex-1">
+                  <p className="text-xs font-semibold text-gray-800 dark:text-gray-200">{c.author.full_name ?? c.author.username}</p>
+                  <p className="text-xs text-gray-700 dark:text-gray-300 mt-0.5">{c.content}</p>
                 </div>
               </div>
             ))}
             <form onSubmit={submitComment} className="flex gap-2.5 mt-2">
-              <div className="w-8 h-8 rounded-full bg-[#0A66C2] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-[var(--accent)] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                 {meInitials}
               </div>
               <input
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Write a comment…"
-                className="flex-1 rounded-full bg-[#F3F2EF] border border-[#C0C0C0] px-4 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-[#0A66C2]"
+                className="flex-1 rounded-full bg-[var(--bg-base)] dark:bg-[#252525] border border-[#C0C0C0] dark:border-[#3E3E3E] px-4 py-1.5 text-xs text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-[var(--accent)]"
               />
               <button type="submit" disabled={submitting || !newComment.trim()}
-                className="rounded-full bg-[#0A66C2] px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50 hover:bg-[#004182] transition-colors">
+                className="rounded-full gradient-accent px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50 hover:opacity-90 transition-colors">
                 Post
               </button>
             </form>

@@ -87,7 +87,7 @@ export default function ConversationPage() {
   const otherInitials = other ? (other.full_name ?? other.username).slice(0, 2).toUpperCase() : "";
 
   return (
-    <div className="h-screen bg-[#F3F2EF] flex flex-col">
+    <div className="h-screen bg-[var(--bg-base)] flex flex-col">
       <Navbar />
 
       <div className="flex-1 flex max-w-[1080px] mx-auto w-full px-4 py-4 overflow-hidden">
@@ -96,7 +96,7 @@ export default function ConversationPage() {
           {/* Chat header */}
           {other && (
             <div className="px-4 py-3 border-b border-[#E0DFDC] flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#EEF3F8] flex items-center justify-center text-[#0A66C2] font-bold text-sm">
+              <div className="w-10 h-10 rounded-full bg-[var(--accent-light)] flex items-center justify-center text-[var(--accent)] font-bold text-sm">
                 {otherInitials}
               </div>
               <div>
@@ -119,8 +119,8 @@ export default function ConversationPage() {
                   <div
                     className={`max-w-xs px-4 py-2 rounded-2xl text-sm ${
                       isMine
-                        ? "bg-[#0A66C2] text-white rounded-br-sm"
-                        : "bg-[#F3F2EF] text-gray-800 rounded-bl-sm"
+                        ? "bg-[var(--accent)] text-white rounded-br-sm"
+                        : "bg-[var(--bg-base)] text-gray-800 rounded-bl-sm"
                     }`}
                   >
                     {m.content}
@@ -138,12 +138,12 @@ export default function ConversationPage() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder="Type a message…"
-                className="flex-1 rounded-full bg-[#F3F2EF] border border-[#C0C0C0] px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-[#0A66C2]"
+                className="flex-1 rounded-full bg-[var(--bg-base)] border border-[#C0C0C0] px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-[var(--accent)]"
               />
               <button
                 type="submit"
                 disabled={sending || !text.trim()}
-                className="rounded-full bg-[#0A66C2] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 hover:bg-[#004182] transition-colors"
+                className="rounded-full gradient-accent px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 hover:opacity-90 transition-colors"
               >
                 Send
               </button>
