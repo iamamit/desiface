@@ -44,7 +44,18 @@ export default function LeftSidebar() {
             {user.full_name ?? user.username}
           </Link>
           <p className="text-xs text-gray-500 dark:text-gray-400">@{user.username}</p>
-          {user.bio && (
+          {user.headline && (
+            <p className="text-xs text-gray-700 dark:text-gray-300 mt-1 line-clamp-2 font-medium">{user.headline}</p>
+          )}
+          {user.location && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-0.5">
+              <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+              </svg>
+              {user.location}
+            </p>
+          )}
+          {!user.headline && user.bio && (
             <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">{user.bio}</p>
           )}
         </div>

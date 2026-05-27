@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.routers import ws as ws_router
 
 from app.core.database import get_db
+from app.core.email import send_new_message_email
 from app.models.message import Message
 from app.models.user import User
 from app.routers.auth import get_current_user
@@ -96,4 +97,15 @@ async def send_message(
         "id": str(msg.id),
         "created_at": msg.created_at.isoformat(),
     })
+
+    try:
+        send_new_message_email(
+            to=other.email,
+            sender_name=current_user.full_name or current_user.username,
+            sender_username=current_user.username,
+            preview=msg.content,
+        )
+    except Exception:
+        pass
+
     return msg
