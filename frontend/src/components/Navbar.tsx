@@ -80,12 +80,17 @@ function ThemeToggle() {
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, logout } = useAuthStore();
+  const { user, logout, fetchMe } = useAuthStore();
   const [unread, setUnread] = useState(0);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<User[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (user) fetchMe().catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const fetchCounts = () => {
