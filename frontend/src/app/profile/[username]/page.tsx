@@ -79,7 +79,7 @@ export default function ProfilePage() {
 
   if (notFound) {
     return (
-      <div className="min-h-screen bg-[#F3F2EF]">
+      <div className="min-h-screen bg-[var(--bg-base)]">
         <Navbar />
         <div className="flex items-center justify-center py-20">
           <p className="text-gray-500">User <span className="font-semibold">@{username}</span> not found.</p>
@@ -90,7 +90,7 @@ export default function ProfilePage() {
 
   if (privateProfile) {
     return (
-      <div className="min-h-screen bg-[#F3F2EF]">
+      <div className="min-h-screen bg-[var(--bg-base)]">
         <Navbar />
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
@@ -104,17 +104,17 @@ export default function ProfilePage() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-[#F3F2EF]">
+      <div className="min-h-screen bg-[var(--bg-base)]">
         <Navbar />
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-4 border-[#0A66C2] border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F3F2EF]">
+    <div className="min-h-screen bg-[var(--bg-base)]">
       <Navbar />
       <div className="max-w-[1080px] mx-auto px-4 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-4">
@@ -132,7 +132,7 @@ export default function ProfilePage() {
           <div className="space-y-2">
             <div className="bg-white rounded-lg border border-[#E0DFDC] overflow-hidden">
               {/* Cover */}
-              <div className="h-32 bg-gradient-to-r from-[#0A66C2] to-[#004182]" />
+              <div className="h-32 bg-gradient-to-r from-[var(--gradient-a)] to-[var(--gradient-b)]" />
 
               {/* Avatar + actions row */}
               <div className="px-6 pb-4">
@@ -144,7 +144,7 @@ export default function ProfilePage() {
                       className="w-24 h-24 rounded-full border-4 border-white object-cover"
                     />
                   ) : (
-                    <div className="w-24 h-24 rounded-full border-4 border-white bg-[#0A66C2] flex items-center justify-center text-white font-bold text-3xl">
+                    <div className="w-24 h-24 rounded-full border-4 border-white bg-[var(--accent)] flex items-center justify-center text-white font-bold text-3xl">
                       {initials}
                     </div>
                   )}
@@ -153,7 +153,7 @@ export default function ProfilePage() {
                     {isOwner ? (
                       <button
                         onClick={() => setEditing(true)}
-                        className="rounded-full border-2 border-[#0A66C2] px-4 py-1.5 text-sm font-semibold text-[#0A66C2] hover:bg-[#EEF3F8] transition-colors"
+                        className="rounded-full border-2 border-[var(--accent)] px-4 py-1.5 text-sm font-semibold text-[var(--accent)] hover:bg-[var(--accent-light)] transition-colors"
                       >
                         Edit profile
                       </button>
@@ -166,17 +166,17 @@ export default function ProfilePage() {
                             connStatus?.connected
                               ? "border-2 border-gray-400 text-gray-600 hover:border-red-400 hover:text-red-400"
                               : connStatus?.pending_received
-                              ? "bg-[#0A66C2] text-white hover:bg-[#004182]"
+                              ? "gradient-accent text-white hover:opacity-90"
                               : connStatus?.pending_sent
                               ? "border-2 border-gray-300 text-gray-400"
-                              : "bg-[#0A66C2] text-white hover:bg-[#004182]"
+                              : "gradient-accent text-white hover:opacity-90"
                           }`}
                         >
                           {connectLabel()}
                         </button>
                         <button
                           onClick={() => router.push(`/messages/${profile.username}`)}
-                          className="rounded-full border-2 border-[#0A66C2] px-4 py-1.5 text-sm font-semibold text-[#0A66C2] hover:bg-[#EEF3F8] transition-colors"
+                          className="rounded-full border-2 border-[var(--accent)] px-4 py-1.5 text-sm font-semibold text-[var(--accent)] hover:bg-[var(--accent-light)] transition-colors"
                         >
                           Message
                         </button>

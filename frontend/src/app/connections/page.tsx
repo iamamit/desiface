@@ -11,7 +11,7 @@ import type { User } from "@/types/user";
 
 function Avatar({ name }: { name: string }) {
   return (
-    <div className="w-12 h-12 rounded-full bg-[#EEF3F8] flex items-center justify-center text-[#0A66C2] font-bold text-sm flex-shrink-0">
+    <div className="w-12 h-12 rounded-full bg-[var(--accent-light)] flex items-center justify-center text-[var(--accent)] font-bold text-sm flex-shrink-0">
       {name.slice(0, 2).toUpperCase()}
     </div>
   );
@@ -72,7 +72,7 @@ export default function ConnectionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F3F2EF]">
+    <div className="min-h-screen bg-[var(--bg-base)]">
       <Navbar />
       <div className="max-w-[1080px] mx-auto px-4 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-4">
@@ -91,7 +91,7 @@ export default function ConnectionsPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by name or username…"
-                className="w-full rounded-lg bg-[#EEF3F8] border border-transparent px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-[#0A66C2]"
+                className="w-full rounded-lg bg-[var(--accent-light)] border border-transparent px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-[var(--accent)]"
               />
               {results.length > 0 && (
                 <div className="mt-3 space-y-3">
@@ -108,7 +108,7 @@ export default function ConnectionsPage() {
                         className={`flex items-center gap-1 rounded-full px-4 py-1.5 text-sm font-semibold transition-colors ${
                           sentIds.has(u.id)
                             ? "border border-gray-300 text-gray-400"
-                            : "border-2 border-[#0A66C2] text-[#0A66C2] hover:bg-[#EEF3F8]"
+                            : "border-2 border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent-light)]"
                         }`}
                       >
                         {sentIds.has(u.id) ? "Sent" : (
@@ -135,7 +135,7 @@ export default function ConnectionsPage() {
                     onClick={() => setTab(t)}
                     className={`flex-1 py-3 text-sm font-semibold transition-colors ${
                       tab === t
-                        ? "border-b-2 border-[#0A66C2] text-[#0A66C2]"
+                        ? "border-b-2 border-[var(--accent)] text-[var(--accent)]"
                         : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                     }`}
                   >
@@ -183,7 +183,7 @@ export default function ConnectionsPage() {
                         <p className="text-xs text-gray-500">@{r.requester.username}</p>
                       </div>
                       <div className="flex gap-2">
-                        <button onClick={() => accept(r.id)} className="rounded-full bg-[#0A66C2] px-4 py-1.5 text-sm font-semibold text-white hover:bg-[#004182] transition-colors">Accept</button>
+                        <button onClick={() => accept(r.id)} className="rounded-full gradient-accent px-4 py-1.5 text-sm font-semibold text-white hover:opacity-90 transition-colors">Accept</button>
                         <button onClick={() => decline(r.id)} className="rounded-full border-2 border-gray-400 px-4 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Ignore</button>
                       </div>
                     </div>

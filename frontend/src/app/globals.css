@@ -1,7 +1,46 @@
 @import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
+
+/* ── Default theme: Classic Blue ── */
+:root {
+  --accent:            #0A66C2;
+  --accent-dark:       #004182;
+  --accent-light:      #EEF3F8;
+  --accent-light-dark: #1E2A35;
+  --bg-base:           #F3F2EF;
+  --gradient-a:        #2080D4;
+  --gradient-b:        #003474;
+}
+
+@utility gradient-accent {
+  background-image: linear-gradient(135deg, var(--gradient-a) 0%, var(--gradient-b) 100%);
+}
+
+.dark {
+  --bg-base: #111111;
+}
+
+/* ── Heritage theme: Indian-German flag colors ── */
+html[data-accent="heritage"] {
+  --accent:            #B85300;
+  --accent-dark:       #8B3D00;
+  --accent-light:      #FFF3EC;
+  --accent-light-dark: #2A1600;
+  --bg-base:           #F5EDE3;
+  --gradient-a:        #F08010;
+  --gradient-b:        #7A2800;
+}
+
+html.dark[data-accent="heritage"] {
+  --bg-base: #111111;
+}
 
 body {
   font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: #F3F2EF;
+  background-color: var(--bg-base);
   color: #1c1c1c;
+}
+
+.dark body {
+  color: #E5E5E5;
 }
