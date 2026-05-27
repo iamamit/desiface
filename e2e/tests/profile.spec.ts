@@ -28,7 +28,7 @@ test.describe("Profile", () => {
     await page.getByRole("button", { name: "Edit profile" }).click();
 
     // Modal should be open
-    await expect(page.locator("text=Edit intro")).toBeVisible();
+    await expect(page.getByTestId("edit-profile-modal")).toBeVisible();
 
     const bio = `Bio set by Playwright at ${Date.now()}`;
     await page.locator('textarea[placeholder="Tell people a little about yourself"]').fill(bio);

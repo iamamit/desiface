@@ -5,6 +5,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.email import send_connection_accepted_email, send_connection_request_email
 from app.models.connection import Connection
 from app.models.notification import Notification
 from app.models.user import User
@@ -73,6 +74,16 @@ def send_request(user_id: uuid.UUID, current_user: User = Depends(get_current_us
     db.add(notif)
     db.commit()
     db.refresh(conn)
+
+    try:
+        send_connection_request_email(
+            to=target.email,
+            requester_name=current_user.full_name or current_user.username,
+            requester_username=current_user.username,
+        )
+    except Exception:
+        pass
+
     return conn
 
 
@@ -86,11 +97,23 @@ def accept_request(connection_id: uuid.UUID, current_user: User = Depends(get_cu
     if not conn:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Request not found")
 
+    requester = db.query(User).filter(User.id == conn.requester_id).first()
     conn.status = "accepted"
     notif = Notification(user_id=conn.requester_id, actor_id=current_user.id, type="connection_accepted", entity_id=conn.id)
     db.add(notif)
     db.commit()
     db.refresh(conn)
+
+    if requester:
+        try:
+            send_connection_accepted_email(
+                to=requester.email,
+                acceptor_name=current_user.full_name or current_user.username,
+                acceptor_username=current_user.username,
+            )
+        except Exception:
+            pass
+
     return conn
 
 

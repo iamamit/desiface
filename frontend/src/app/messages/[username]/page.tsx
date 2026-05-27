@@ -49,6 +49,12 @@ export default function ConversationPage() {
               email: "",
               bio: null,
               avatar_url: null,
+              cover_url: null,
+              headline: null,
+              location: null,
+              work_experience: null,
+              education: null,
+              skills: null,
               is_verified: false,
               profile_visibility: "public" as const,
               created_at: data.created_at,
@@ -71,7 +77,7 @@ export default function ConversationPage() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  async function send(e: React.FormEvent) {
+  async function send(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!text.trim() || !other) return;
     setSending(true);
