@@ -2,16 +2,16 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class UserUpdate(BaseModel):
-    full_name: str | None = None
-    bio: str | None = None
+    full_name: str | None = Field(None, max_length=100)
+    bio: str | None = Field(None, max_length=2000)
     avatar_url: str | None = None
     cover_url: str | None = None
-    headline: str | None = None
-    location: str | None = None
+    headline: str | None = Field(None, max_length=220)
+    location: str | None = Field(None, max_length=100)
     work_experience: list[Any] | None = None
     education: list[Any] | None = None
     skills: list[str] | None = None

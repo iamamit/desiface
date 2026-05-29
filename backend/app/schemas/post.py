@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.schemas.user import UserPublic
 
@@ -17,7 +17,7 @@ class SharedPostOut(BaseModel):
 
 
 class PostCreate(BaseModel):
-    content: str = ""
+    content: str = Field("", max_length=3000)
     image_url: str | None = None
     shared_post_id: str | None = None
     visibility: str = "public"
@@ -25,12 +25,12 @@ class PostCreate(BaseModel):
 
 
 class PostEdit(BaseModel):
-    content: str
+    content: str = Field(..., max_length=3000)
     tag: str | None = None
 
 
 class CommentCreate(BaseModel):
-    content: str
+    content: str = Field(..., max_length=1000)
     parent_id: uuid.UUID | None = None
 
 
