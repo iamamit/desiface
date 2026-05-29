@@ -10,6 +10,13 @@ import { useAuthStore } from "@/store/auth";
 
 const THEMES = [
   {
+    id: "teal" as const,
+    name: "Desi Teal",
+    description: "Dark shell, teal accent — the default look",
+    gradient: "linear-gradient(135deg, #3d8a7b, #155c52)",
+    secondary: "#1c1c1c",
+  },
+  {
     id: "blue" as const,
     name: "Classic Blue",
     description: "Professional blue — LinkedIn-inspired",
@@ -77,7 +84,7 @@ export default function SettingsPage() {
         <div className="bg-white dark:bg-[#1c1c1c] rounded-lg border border-[#E0DFDC] dark:border-[#2E2E2E] p-6">
           <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-1">Colour theme</h2>
           <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Changes the accent colour across the whole app.</p>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             {THEMES.map((t) => {
               const active = accent === t.id;
               return (
