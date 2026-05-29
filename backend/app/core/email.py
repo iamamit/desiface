@@ -1,25 +1,19 @@
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+import httpx
 
 from app.core.config import settings
 
 
 def send_email(to: str, subject: str, html: str) -> None:
-    if not settings.SMTP_HOST or not settings.SMTP_USER:
+    if not settings.RESEND_API_KEY:
         print(f"\n[EMAIL] To: {to}\n[EMAIL] Subject: {subject}\n[EMAIL] Body:\n{html}\n")
         return
 
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"] = settings.FROM_EMAIL
-    msg["To"] = to
-    msg.attach(MIMEText(html, "html"))
-
-    with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT) as server:
-        server.starttls()
-        server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
-        server.sendmail(settings.FROM_EMAIL, to, msg.as_string())
+    httpx.post(
+        "https://api.resend.com/emails",
+        headers={"Authorization": f"Bearer {settings.RESEND_API_KEY}"},
+        json={"from": settings.FROM_EMAIL, "to": [to], "subject": subject, "html": html},
+        timeout=10,
+    ).raise_for_status()
 
 
 def send_connection_request_email(to: str, requester_name: str, requester_username: str) -> None:

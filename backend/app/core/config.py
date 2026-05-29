@@ -9,11 +9,8 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
 
-    # Email (optional — if not set, links are logged to console)
-    SMTP_HOST: str = ""
-    SMTP_PORT: int = 587
-    SMTP_USER: str = ""
-    SMTP_PASSWORD: str = ""
+    # Email — Resend API (if not set, emails are logged to console)
+    RESEND_API_KEY: str = ""
     FROM_EMAIL: str = "noreply@desiface.com"
     FRONTEND_URL: str = "http://localhost:3001"
 
