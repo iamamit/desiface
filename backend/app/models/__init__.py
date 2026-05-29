@@ -1,5 +1,6 @@
 from app.models.comment import Comment
 from app.models.connection import Connection
+from app.models.error_log import ErrorLog
 from app.models.group import Group, GroupMember, GroupPost
 from app.models.job import Job
 from app.models.like import Like
@@ -15,4 +16,5 @@ from app.models.user import User
 __all__ = [
     "User", "Post", "Like", "Comment", "Connection", "Notification", "Message", "OTPToken",
     "Service", "Program", "ProgramRSVP", "SavedPost", "Job", "Group", "GroupMember", "GroupPost",
+    "ErrorLog",
 ]

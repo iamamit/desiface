@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     # Dev mode: return tokens in API responses — MUST be False in production
     DEV_MODE: bool = False
 
+    # Admin bootstrap: set this in .env to promote the first admin via POST /admin/bootstrap
+    ADMIN_BOOTSTRAP_SECRET: str = ""
+
     class Config:
         env_file = ".env"
 

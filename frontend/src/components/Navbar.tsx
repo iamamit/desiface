@@ -304,6 +304,11 @@ export default function Navbar() {
                   <Link href="/settings" className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2E2E2E]">
                     Settings
                   </Link>
+                  {user.is_admin && (
+                    <Link href="/admin" className="block w-full text-left px-4 py-2 text-sm text-[var(--accent)] font-medium hover:bg-gray-50 dark:hover:bg-[#2E2E2E]">
+                      Admin Dashboard
+                    </Link>
+                  )}
                   <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2E2E2E]">
                     Sign Out
                   </button>
@@ -411,6 +416,12 @@ export default function Navbar() {
                 className="flex items-center py-3 text-sm text-gray-700 dark:text-gray-300 border-b border-[#F0F0F0] dark:border-[#2E2E2E]">
                 Settings
               </Link>
+              {user?.is_admin && (
+                <Link href="/admin" onClick={() => setShowMore(false)}
+                  className="flex items-center py-3 text-sm text-[var(--accent)] font-medium border-b border-[#F0F0F0] dark:border-[#2E2E2E]">
+                  Admin Dashboard
+                </Link>
+              )}
               <button onClick={() => { setShowMore(false); handleLogout(); }}
                 className="w-full text-left py-3 text-sm text-red-500">
                 Sign out

@@ -29,6 +29,7 @@ export interface User {
   education: Education[] | null;
   skills: string[] | null;
   is_verified: boolean;
+  is_admin: boolean;
   profile_visibility: "public" | "friends_only";
   created_at: string;
 }

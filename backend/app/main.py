@@ -1,3 +1,4 @@
+import json
 import os
 
 from fastapi import FastAPI, Request
@@ -9,7 +10,9 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from app.core.config import settings
-from app.routers import auth, connections, groups, jobs, messages, notifications, posts, programs, search, services, users, ws
+from app.core.database import SessionLocal
+from app.models.error_log import ErrorLog
+from app.routers import admin, auth, connections, groups, jobs, messages, notifications, posts, programs, search, services, users, ws
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -25,6 +28,61 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.middleware("http")
+async def log_errors(request: Request, call_next):
+    response = await call_next(request)
+
+    if response.status_code >= 400:
+        # Read the response body to capture the error detail
+        body_bytes = b""
+        async for chunk in response.body_iterator:
+            body_bytes += chunk
+
+        detail = None
+        try:
+            parsed = json.loads(body_bytes)
+            detail = parsed.get("detail") or str(parsed)
+        except Exception:
+            detail = body_bytes.decode(errors="replace")[:500] if body_bytes else None
+
+        # Extract user_id from JWT if present (best-effort, no DB call)
+        user_id = None
+        auth_header = request.headers.get("authorization", "")
+        if auth_header.startswith("Bearer "):
+            from app.core.security import decode_access_token
+            user_id = decode_access_token(auth_header[7:])
+
+        ip = request.headers.get("x-forwarded-for", request.client.host if request.client else None)
+        query = str(request.query_params) if request.query_params else None
+
+        try:
+            db = SessionLocal()
+            db.add(ErrorLog(
+                method=request.method,
+                path=request.url.path,
+                status_code=response.status_code,
+                detail=str(detail)[:1000] if detail else None,
+                user_id=str(user_id) if user_id else None,
+                ip_address=ip,
+                query_params=query,
+            ))
+            db.commit()
+            db.close()
+        except Exception:
+            pass  # never let logging break the response
+
+        from fastapi.responses import Response
+        return Response(
+            content=body_bytes,
+            status_code=response.status_code,
+            headers=dict(response.headers),
+            media_type=response.media_type,
+        )
+
+    return response
+
+
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(posts.router)
@@ -37,6 +95,7 @@ app.include_router(programs.router)
 app.include_router(jobs.router)
 app.include_router(groups.router)
 app.include_router(ws.router)
+app.include_router(admin.router)
 
 UPLOAD_DIR = "/app/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
