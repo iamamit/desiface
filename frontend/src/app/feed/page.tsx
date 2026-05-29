@@ -285,6 +285,7 @@ export default function FeedPage() {
                   key={p.id}
                   post={p}
                   onDeleted={(id) => setPosts((prev) => prev.filter((x) => x.id !== id))}
+                  onUpdated={(updated) => setPosts((prev) => prev.map((x) => x.id === updated.id ? updated : x))}
                   onShared={(newPost) => setPosts((prev) => [newPost, ...prev])}
                 />
               ))
