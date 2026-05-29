@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Desiface",
-  description: "The social network for Indians in Germany",
+  description: "The Indian community in Germany",
   icons: { icon: "/logo.svg" },
 };
 
