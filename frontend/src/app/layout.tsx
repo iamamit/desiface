@@ -14,9 +14,26 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Desiface",
-  description: "The Indian community in Germany",
+  title: {
+    default: "Desiface",
+    template: "%s | Desiface",
+  },
+  description: "The Indian community in Germany — connect with Indians living and working in Germany.",
   icons: { icon: "/logo.svg" },
+  openGraph: {
+    siteName: "Desiface",
+    locale: "en_GB",
+    type: "website",
+    title: "Desiface",
+    description: "The Indian community in Germany — connect with Indians living and working in Germany.",
+    url: "https://desiface.com",
+  },
+  twitter: {
+    card: "summary",
+    title: "Desiface",
+    description: "The Indian community in Germany",
+  },
+  metadataBase: new URL("https://desiface.com"),
 };
 
 export default function RootLayout({
