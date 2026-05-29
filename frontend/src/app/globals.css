@@ -7,6 +7,7 @@
   --accent-dark:       #155c52;
   --accent-light:      #e6f4f2;
   --accent-light-dark: #0d2e2b;
+
   --bg-base:           #F0F4F2;
   --gradient-a:        #3d8a7b;
   --gradient-b:        #155c52;
@@ -21,6 +22,7 @@ html[data-accent="teal"] {
   --accent-dark:       #155c52;
   --accent-light:      #e6f4f2;
   --accent-light-dark: #0d2e2b;
+
   --bg-base:           #F0F4F2;
   --gradient-a:        #3d8a7b;
   --gradient-b:        #155c52;
