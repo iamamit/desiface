@@ -428,7 +428,7 @@ export default function CommunityPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#F3F2EF] dark:bg-[#121212] pt-4 pb-16">
+      <main className="min-h-screen bg-[var(--bg-base)] dark:bg-[#111111] pt-4 pb-16">
         <div className="max-w-[1080px] mx-auto px-4 flex gap-5">
           <aside className="w-[220px] flex-shrink-0 hidden md:block">
             <LeftSidebar />
