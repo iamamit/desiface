@@ -71,9 +71,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-[#111111] flex flex-col">
       <div className="px-6 py-4">
-        <div className="w-10 h-10 rounded bg-[var(--accent)] flex items-center justify-center">
-          <span className="text-white font-extrabold text-base italic">df</span>
-        </div>
+        <img src="/logo.svg" alt="Desiface" className="w-10 h-10 rounded-lg" />
       </div>
 
       <div className="flex flex-1 items-start justify-start max-w-[1080px] mx-auto w-full px-6 pt-8 gap-20">

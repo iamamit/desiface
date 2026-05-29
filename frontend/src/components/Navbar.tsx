@@ -171,9 +171,7 @@ export default function Navbar() {
         <div className="max-w-[1080px] mx-auto px-4 flex items-center h-14 gap-2">
           {/* Logo */}
           <Link href="/feed" className="flex-shrink-0">
-            <div className="w-9 h-9 rounded gradient-accent flex items-center justify-center">
-              <span className="text-white font-extrabold text-base italic tracking-tight">df</span>
-            </div>
+            <img src="/logo.svg" alt="Desiface" className="w-9 h-9 rounded-lg" />
           </Link>
 
           {/* Search */}
