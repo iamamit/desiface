@@ -56,6 +56,7 @@ export default function ConversationPage() {
               education: null,
               skills: null,
               is_verified: false,
+              is_admin: false,
               profile_visibility: "public" as const,
               created_at: data.created_at,
             },
