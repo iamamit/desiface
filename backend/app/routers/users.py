@@ -7,6 +7,8 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.security import decode_access_token
+from sqlalchemy import or_
+
 from app.models.connection import Connection
 from app.models.user import User
 from app.routers.auth import get_current_user
@@ -111,6 +113,64 @@ async def upload_cover(
     db.commit()
     db.refresh(current_user)
     return current_user
+
+
+@router.get("/suggestions", response_model=list[UserPublic])
+def get_suggestions(
+    limit: int = 8,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """People you may know: friends-of-friends not yet connected."""
+    accepted = db.query(Connection).filter(
+        Connection.status == "accepted",
+        or_(Connection.requester_id == current_user.id, Connection.addressee_id == current_user.id),
+    ).all()
+
+    connected_ids: set[uuid.UUID] = set()
+    for c in accepted:
+        other = c.requester_id if c.addressee_id == current_user.id else c.addressee_id
+        connected_ids.add(other)
+    connected_ids.add(current_user.id)
+
+    # pending requests (don't suggest users we already sent/received request from)
+    pending = db.query(Connection).filter(
+        or_(Connection.requester_id == current_user.id, Connection.addressee_id == current_user.id),
+    ).all()
+    for c in pending:
+        other = c.requester_id if c.addressee_id == current_user.id else c.addressee_id
+        connected_ids.add(other)
+
+    # friends-of-friends
+    friend_of_friend_ids: set[uuid.UUID] = set()
+    fof_connections = db.query(Connection).filter(
+        Connection.status == "accepted",
+        or_(
+            Connection.requester_id.in_(connected_ids - {current_user.id}),
+            Connection.addressee_id.in_(connected_ids - {current_user.id}),
+        ),
+    ).all()
+    for c in fof_connections:
+        for uid in (c.requester_id, c.addressee_id):
+            if uid not in connected_ids:
+                friend_of_friend_ids.add(uid)
+
+    if friend_of_friend_ids:
+        users = (
+            db.query(User)
+            .filter(User.id.in_(friend_of_friend_ids), User.is_active == True)  # noqa: E712
+            .limit(limit)
+            .all()
+        )
+    else:
+        # fallback: any active users not connected
+        users = (
+            db.query(User)
+            .filter(User.id.notin_(connected_ids), User.is_active == True)  # noqa: E712
+            .limit(limit)
+            .all()
+        )
+    return users
 
 
 @router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)

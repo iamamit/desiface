@@ -24,8 +24,18 @@ class PostCreate(BaseModel):
     tag: str | None = None
 
 
+class PostEdit(BaseModel):
+    content: str
+    tag: str | None = None
+
+
 class CommentCreate(BaseModel):
     content: str
+    parent_id: uuid.UUID | None = None
+
+
+class ReactionCreate(BaseModel):
+    reaction_type: str = "like"
 
 
 class CommentOut(BaseModel):
@@ -33,8 +43,18 @@ class CommentOut(BaseModel):
     content: str
     created_at: datetime
     author: UserPublic
+    parent_id: uuid.UUID | None = None
+    replies: list["CommentOut"] = []
 
     model_config = {"from_attributes": True}
+
+
+CommentOut.model_rebuild()
+
+
+class ReactionSummary(BaseModel):
+    type: str
+    count: int
 
 
 class PostOut(BaseModel):
@@ -49,5 +69,8 @@ class PostOut(BaseModel):
     like_count: int = 0
     comment_count: int = 0
     liked_by_me: bool = False
+    my_reaction: str | None = None
+    reactions: list[ReactionSummary] = []
+    saved_by_me: bool = False
 
     model_config = {"from_attributes": True}

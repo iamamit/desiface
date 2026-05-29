@@ -85,6 +85,9 @@ export default function LeftSidebar() {
           { href: "/connections", label: "My Network", icon: "👥" },
           { href: "/messages", label: "Messages", icon: "💬" },
           { href: "/notifications", label: "Notifications", icon: "🔔" },
+          { href: "/saved", label: "Saved Posts", icon: "🔖" },
+          { href: "/jobs", label: "Jobs", icon: "💼" },
+          { href: "/groups", label: "Groups", icon: "🫂" },
         ].map(({ href, label, icon }) => (
           <Link
             key={href}

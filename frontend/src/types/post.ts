@@ -13,6 +13,20 @@ export type PostTag =
   | "teaching" | "language" | "housing" | "tech"
   | "networking" | "cultural" | "general";
 
+export interface ReactionSummary {
+  type: string;
+  count: number;
+}
+
+export interface Comment {
+  id: string;
+  content: string;
+  created_at: string;
+  author: User;
+  parent_id?: string | null;
+  replies?: Comment[];
+}
+
 export interface Post {
   id: string;
   content: string;
@@ -25,11 +39,7 @@ export interface Post {
   like_count: number;
   comment_count: number;
   liked_by_me: boolean;
-}
-
-export interface Comment {
-  id: string;
-  content: string;
-  created_at: string;
-  author: User;
+  my_reaction?: string | null;
+  reactions?: ReactionSummary[];
+  saved_by_me?: boolean;
 }

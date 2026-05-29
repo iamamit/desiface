@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 
 import api from "@/lib/api";
 import { useAuthStore } from "@/store/auth";
+import type { Post } from "@/types/post";
 import type { User } from "@/types/user";
 
 function NavItem({
@@ -84,7 +85,8 @@ export default function Navbar() {
   const [unread, setUnread] = useState(0);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [search, setSearch] = useState("");
-  const [results, setResults] = useState<User[]>([]);
+  const [userResults, setUserResults] = useState<User[]>([]);
+  const [postResults, setPostResults] = useState<Pick<Post, "id" | "content" | "author">[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -103,21 +105,19 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (!search.trim()) { setResults([]); return; }
+    if (!search.trim()) { setUserResults([]); setPostResults([]); return; }
     const t = setTimeout(() => {
-      api.get<User[]>(`/search/users?q=${encodeURIComponent(search)}&limit=5`)
-        .then((r) => setResults(r.data))
-        .catch(() => {});
+      api.get<User[]>(`/search/users?q=${encodeURIComponent(search)}&limit=4`).then((r) => setUserResults(r.data)).catch(() => {});
+      api.get<Pick<Post, "id" | "content" | "author">[]>(`/search/posts?q=${encodeURIComponent(search)}&limit=3`).then((r) => setPostResults(r.data)).catch(() => {});
     }, 300);
     return () => clearTimeout(t);
   }, [search]);
 
+  function clearSearch() { setUserResults([]); setPostResults([]); setSearch(""); }
+
   useEffect(() => {
     function handler(e: MouseEvent) {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-        setResults([]);
-        setSearch("");
-      }
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) clearSearch();
     }
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -153,23 +153,42 @@ export default function Navbar() {
               className="bg-transparent text-sm focus:outline-none w-full text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-500"
             />
           </div>
-          {results.length > 0 && (
-            <div className="absolute top-full mt-1 w-72 bg-white dark:bg-[#242424] rounded-lg shadow-xl border border-gray-200 dark:border-[#3E3E3E] z-50 overflow-hidden">
-              {results.map((u) => (
-                <button
-                  key={u.id}
-                  onClick={() => { router.push(`/profile/${u.username}`); setResults([]); setSearch(""); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-[#2E2E2E] text-left"
-                >
-                  <div className="w-10 h-10 rounded-full bg-[var(--accent-light)] dark:bg-[var(--accent-light-dark)] flex items-center justify-center text-[var(--accent)] text-sm font-bold flex-shrink-0">
-                    {(u.full_name ?? u.username).slice(0, 2).toUpperCase()}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{u.full_name ?? u.username}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">@{u.username}</p>
-                  </div>
-                </button>
-              ))}
+          {(userResults.length > 0 || postResults.length > 0) && (
+            <div className="absolute top-full mt-1 w-80 bg-white dark:bg-[#242424] rounded-lg shadow-xl border border-gray-200 dark:border-[#3E3E3E] z-50 overflow-hidden">
+              {userResults.length > 0 && (
+                <>
+                  <p className="px-4 pt-3 pb-1 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">People</p>
+                  {userResults.map((u) => (
+                    <button key={u.id} onClick={() => { router.push(`/profile/${u.username}`); clearSearch(); }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-[#2E2E2E] text-left">
+                      <div className="w-8 h-8 rounded-full bg-[var(--accent-light)] dark:bg-[var(--accent-light-dark)] flex items-center justify-center text-[var(--accent)] text-xs font-bold flex-shrink-0">
+                        {(u.full_name ?? u.username).slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{u.full_name ?? u.username}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">@{u.username}</p>
+                      </div>
+                    </button>
+                  ))}
+                </>
+              )}
+              {postResults.length > 0 && (
+                <>
+                  <p className="px-4 pt-3 pb-1 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide border-t border-gray-100 dark:border-[#3E3E3E]">Posts</p>
+                  {postResults.map((p) => (
+                    <button key={p.id} onClick={() => { router.push(`/profile/${p.author.username}`); clearSearch(); }}
+                      className="w-full flex items-start gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-[#2E2E2E] text-left">
+                      <div className="w-8 h-8 rounded-full bg-[var(--accent-light)] dark:bg-[var(--accent-light-dark)] flex items-center justify-center text-[var(--accent)] text-xs font-bold flex-shrink-0 mt-0.5">
+                        {(p.author.full_name ?? p.author.username).slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 truncate">{p.author.full_name ?? p.author.username}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mt-0.5">{p.content}</p>
+                      </div>
+                    </button>
+                  ))}
+                </>
+              )}
             </div>
           )}
         </div>
@@ -205,6 +224,12 @@ export default function Navbar() {
           <NavItem href="/community" label="Community" active={pathname.startsWith("/community")}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </NavItem>
+
+          <NavItem href="/jobs" label="Jobs" active={pathname.startsWith("/jobs")}>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </NavItem>
 
