@@ -2,8 +2,10 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from pydantic import BaseModel
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy import func, text
 from sqlalchemy.orm import Session
 
@@ -21,6 +23,7 @@ from app.models.user import User
 from app.routers.auth import get_current_user
 
 router = APIRouter(prefix="/admin", tags=["admin"])
+limiter = Limiter(key_func=get_remote_address)
 
 
 def require_admin(current_user: User = Depends(get_current_user)) -> User:
@@ -37,7 +40,8 @@ class BootstrapPayload(BaseModel):
 
 
 @router.post("/bootstrap", summary="Promote a user to admin using the bootstrap secret")
-def bootstrap_admin(payload: BootstrapPayload, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def bootstrap_admin(request: Request, payload: BootstrapPayload, db: Session = Depends(get_db)):
     """Call once (or as needed) with ADMIN_BOOTSTRAP_SECRET to grant admin to any email."""
     expected = getattr(settings, "ADMIN_BOOTSTRAP_SECRET", None)
     if not expected or payload.secret != expected:

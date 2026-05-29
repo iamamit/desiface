@@ -1,13 +1,13 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.schemas.user import UserPublic
 
 
 class MessageCreate(BaseModel):
-    content: str
+    content: str = Field(..., max_length=2000)
 
 
 class MessageOut(BaseModel):
