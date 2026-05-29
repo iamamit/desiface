@@ -30,6 +30,7 @@ def _serialize_post(post: Post, me: User, db: Session) -> PostOut:
         content=post.content,
         image_url=post.image_url,
         visibility=post.visibility,
+        tag=post.tag,
         shared_post=post.shared_post,
         created_at=post.created_at,
         author=post.author,
@@ -96,12 +97,18 @@ async def upload_image(
 def create_post(payload: PostCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     if not payload.content.strip() and not payload.image_url and not payload.shared_post_id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Post content cannot be empty")
+    VALID_TAGS = {
+        "visa", "legal", "finance", "tax", "career",
+        "teaching", "language", "housing", "tech",
+        "networking", "cultural", "general",
+    }
     post = Post(
         user_id=current_user.id,
         content=payload.content.strip(),
         image_url=payload.image_url,
         shared_post_id=payload.shared_post_id,
         visibility=payload.visibility if payload.visibility in ("public", "friends") else "public",
+        tag=payload.tag if payload.tag in VALID_TAGS else None,
     )
     db.add(post)
     db.commit()
