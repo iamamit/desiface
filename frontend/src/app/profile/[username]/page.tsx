@@ -10,6 +10,7 @@ import api from "@/lib/api";
 import { mediaUrl } from "@/lib/media";
 import { useAuthStore } from "@/store/auth";
 import type { ConnectionStatus } from "@/types/connection";
+import type { Service } from "@/types/community";
 import type { User } from "@/types/user";
 
 function formatMonthYear(date: string | null | undefined): string {
@@ -28,6 +29,7 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false);
   const [connStatus, setConnStatus] = useState<ConnectionStatus | null>(null);
   const [connecting, setConnecting] = useState(false);
+  const [profileServices, setProfileServices] = useState<Service[]>([]);
 
   const isOwner = me?.username === username;
 
@@ -37,6 +39,9 @@ export default function ProfilePage() {
       .then((r) => {
         if (cancelled) return;
         setProfile(r.data);
+        api.get<Service[]>(`/services?user_id=${r.data.id}`)
+          .then((s) => { if (!cancelled) setProfileServices(s.data); })
+          .catch(() => {});
         if (me && me.username !== username) {
           return api.get<ConnectionStatus>(`/connections/status/${r.data.id}`);
         }
@@ -290,6 +295,50 @@ export default function ProfilePage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Services */}
+            {profileServices.length > 0 && (
+              <div className="bg-white dark:bg-[#1c1c1c] rounded-lg border border-[#E0DFDC] dark:border-[#2E2E2E] p-5">
+                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3">Services</h2>
+                <div className="flex flex-col gap-3">
+                  {profileServices.map((svc) => {
+                    const CAT_COLORS: Record<string, string> = {
+                      visa: "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300",
+                      legal: "bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300",
+                      finance: "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300",
+                      tax: "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300",
+                      career: "bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300",
+                      teaching: "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300",
+                      language: "bg-pink-100 dark:bg-pink-900/40 text-pink-700 dark:text-pink-300",
+                      housing: "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300",
+                      tech: "bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300",
+                      other: "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400",
+                    };
+                    const CAT_LABELS: Record<string, string> = {
+                      visa: "Visa / Immigration", legal: "Legal", finance: "Finance", tax: "Tax",
+                      career: "Career", teaching: "Teaching", language: "Language",
+                      housing: "Housing", tech: "Tech Help", other: "Other",
+                    };
+                    return (
+                      <div key={svc.id} className="border border-[#E0DFDC] dark:border-[#2E2E2E] rounded-lg p-3 flex gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${CAT_COLORS[svc.category] ?? "bg-gray-100 text-gray-600"}`}>
+                              {CAT_LABELS[svc.category] ?? svc.category}
+                            </span>
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${svc.is_paid ? "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300" : "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300"}`}>
+                              {svc.is_paid ? (svc.price_info ?? "Paid") : "Free"}
+                            </span>
+                          </div>
+                          <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{svc.title}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">{svc.description}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}

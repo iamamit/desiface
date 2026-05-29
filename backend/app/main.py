@@ -9,7 +9,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from app.core.config import settings
-from app.routers import auth, connections, messages, notifications, posts, search, users, ws
+from app.routers import auth, connections, messages, notifications, posts, programs, search, services, users, ws
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -32,6 +32,8 @@ app.include_router(connections.router)
 app.include_router(notifications.router)
 app.include_router(messages.router)
 app.include_router(search.router)
+app.include_router(services.router)
+app.include_router(programs.router)
 app.include_router(ws.router)
 
 UPLOAD_DIR = "/app/uploads"

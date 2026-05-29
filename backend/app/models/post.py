@@ -17,6 +17,7 @@ class Post(Base):
     image_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     shared_post_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("posts.id", ondelete="SET NULL"), nullable=True)
     visibility: Mapped[str] = mapped_column(String(20), nullable=False, default="public")
+    tag: Mapped[str | None] = mapped_column(String(30), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     author = relationship("User", foreign_keys=[user_id])

@@ -21,6 +21,7 @@ class PostCreate(BaseModel):
     image_url: str | None = None
     shared_post_id: str | None = None
     visibility: str = "public"
+    tag: str | None = None
 
 
 class CommentCreate(BaseModel):
@@ -41,6 +42,7 @@ class PostOut(BaseModel):
     content: str
     image_url: str | None = None
     visibility: str = "public"
+    tag: str | None = None
     shared_post: SharedPostOut | None = None
     created_at: datetime
     author: UserPublic

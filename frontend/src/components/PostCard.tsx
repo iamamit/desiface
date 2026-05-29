@@ -207,6 +207,35 @@ export default function PostCard({ post, onDeleted, onShared }: Props) {
             )}
           </div>
 
+          {/* Tag badge */}
+          {post.tag && (() => {
+            const TAG_STYLES: Record<string, string> = {
+              visa:       "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300",
+              legal:      "bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300",
+              finance:    "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300",
+              tax:        "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300",
+              career:     "bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300",
+              teaching:   "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300",
+              language:   "bg-pink-100 dark:bg-pink-900/40 text-pink-700 dark:text-pink-300",
+              housing:    "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300",
+              tech:       "bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300",
+              networking: "bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300",
+              cultural:   "bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300",
+              general:    "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400",
+            };
+            const TAG_LABELS: Record<string, string> = {
+              visa: "Visa / Immigration", legal: "Legal", finance: "Finance", tax: "Tax",
+              career: "Career", teaching: "Teaching", language: "Language",
+              housing: "Housing", tech: "Tech Help", networking: "Networking",
+              cultural: "Cultural", general: "General",
+            };
+            return (
+              <span className={`inline-block mt-2 text-xs font-semibold px-2.5 py-0.5 rounded-full ${TAG_STYLES[post.tag] ?? "bg-gray-100 text-gray-600"}`}>
+                {TAG_LABELS[post.tag] ?? post.tag}
+              </span>
+            );
+          })()}
+
           {/* Content */}
           {post.content && (
             <p className="mt-3 text-sm text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">{post.content}</p>
