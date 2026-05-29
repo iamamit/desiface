@@ -1,8 +1,37 @@
 @import "tailwindcss";
 @variant dark (&:where(.dark, .dark *));
 
-/* ── Default theme: Classic Blue ── */
+/* ── Default theme: Desi Teal ── */
 :root {
+  --accent:            #1e7268;
+  --accent-dark:       #155c52;
+  --accent-light:      #e6f4f2;
+  --accent-light-dark: #0d2e2b;
+  --bg-base:           #1c1c1c;
+  --gradient-a:        #3d8a7b;
+  --gradient-b:        #155c52;
+}
+
+@utility gradient-accent {
+  background-image: linear-gradient(135deg, var(--gradient-a) 0%, var(--gradient-b) 100%);
+}
+
+html[data-accent="teal"] {
+  --accent:            #1e7268;
+  --accent-dark:       #155c52;
+  --accent-light:      #e6f4f2;
+  --accent-light-dark: #0d2e2b;
+  --bg-base:           #1c1c1c;
+  --gradient-a:        #3d8a7b;
+  --gradient-b:        #155c52;
+}
+
+html.dark[data-accent="teal"] {
+  --bg-base: #111111;
+}
+
+/* ── Classic Blue ── */
+html[data-accent="blue"] {
   --accent:            #0A66C2;
   --accent-dark:       #004182;
   --accent-light:      #EEF3F8;
@@ -12,11 +41,7 @@
   --gradient-b:        #003474;
 }
 
-@utility gradient-accent {
-  background-image: linear-gradient(135deg, var(--gradient-a) 0%, var(--gradient-b) 100%);
-}
-
-.dark {
+html.dark[data-accent="blue"] {
   --bg-base: #111111;
 }
 
@@ -32,6 +57,10 @@ html[data-accent="heritage"] {
 }
 
 html.dark[data-accent="heritage"] {
+  --bg-base: #111111;
+}
+
+.dark {
   --bg-base: #111111;
 }
 
