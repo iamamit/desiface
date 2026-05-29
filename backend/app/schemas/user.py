@@ -32,6 +32,7 @@ class UserPublic(BaseModel):
     education: list[Any] | None = None
     skills: list[str] | None = None
     is_verified: bool
+    is_admin: bool = False
     profile_visibility: str = "public"
     created_at: datetime
 
