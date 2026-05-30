@@ -176,7 +176,7 @@ function CommentRow({ comment, me, onReply }: {
       </div>
       <div className="flex-1">
         <div className="bg-[var(--bg-base)] dark:bg-[#252525] rounded-lg px-3 py-2">
-          <p className="text-xs font-semibold text-gray-800 dark:text-gray-200">{comment.author.full_name ?? comment.author.username}</p>
+          <Link href={`/profile/${comment.author.username}`} className="text-xs font-semibold text-gray-800 dark:text-gray-200 hover:underline">{comment.author.full_name ?? comment.author.username}</Link>
           <p className="text-xs text-gray-700 dark:text-gray-300 mt-0.5 whitespace-pre-wrap">{comment.content}</p>
         </div>
         {me && (
@@ -193,7 +193,7 @@ function CommentRow({ comment, me, onReply }: {
                   {(r.author.full_name ?? r.author.username).slice(0, 2).toUpperCase()}
                 </div>
                 <div className="bg-[var(--bg-base)] dark:bg-[#252525] rounded-lg px-3 py-1.5 flex-1">
-                  <p className="text-xs font-semibold text-gray-800 dark:text-gray-200">{r.author.full_name ?? r.author.username}</p>
+                  <Link href={`/profile/${r.author.username}`} className="text-xs font-semibold text-gray-800 dark:text-gray-200 hover:underline">{r.author.full_name ?? r.author.username}</Link>
                   <p className="text-xs text-gray-700 dark:text-gray-300 mt-0.5 whitespace-pre-wrap">{r.content}</p>
                 </div>
               </div>
