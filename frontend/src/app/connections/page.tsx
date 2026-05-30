@@ -25,6 +25,7 @@ export default function ConnectionsPage() {
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<User[]>([]);
   const [sentIds, setSentIds] = useState<Set<string>>(new Set());
+  const [sendError, setSendError] = useState<string | null>(null);
   const [tab, setTab] = useState<"friends" | "requests">("friends");
   const [acceptError, setAcceptError] = useState<string | null>(null);
 
@@ -42,9 +43,18 @@ export default function ConnectionsPage() {
     return () => clearTimeout(t);
   }, [search]);
 
+  const connectedIds = new Set(connections.map((c) =>
+    c.requester.id === me?.id ? c.addressee.id : c.requester.id
+  ));
+
   async function sendRequest(userId: string) {
-    await api.post(`/connections/${userId}`);
-    setSentIds((prev) => new Set([...prev, userId]));
+    setSendError(null);
+    try {
+      await api.post(`/connections/${userId}`);
+      setSentIds((prev) => new Set([...prev, userId]));
+    } catch {
+      setSendError("Could not send request. You may already be connected.");
+    }
   }
 
   async function accept(connId: string) {
@@ -94,37 +104,51 @@ export default function ConnectionsPage() {
                 placeholder="Search by name or username…"
                 className="w-full rounded-lg bg-[var(--accent-light)] border border-transparent px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-[var(--accent)]"
               />
+              {sendError && (
+                <p className="mt-2 text-xs text-red-500">{sendError}</p>
+              )}
               {results.length > 0 && (
                 <div className="mt-3 space-y-3">
-                  {results.map((u) => (
-                    <div key={u.id} className="flex items-center gap-3">
-                      <Link href={`/profile/${u.username}`} className="flex items-center gap-3 flex-1 min-w-0">
-                        <Avatar name={u.full_name ?? u.username} />
-                        <div className="min-w-0">
-                          <p className="text-sm font-semibold text-gray-900 truncate hover:underline">{u.full_name ?? u.username}</p>
-                          <p className="text-xs text-gray-500">@{u.username}</p>
-                        </div>
-                      </Link>
-                      <button
-                        onClick={() => sendRequest(u.id)}
-                        disabled={sentIds.has(u.id)}
-                        className={`flex items-center gap-1 rounded-full px-4 py-1.5 text-sm font-semibold transition-colors ${
-                          sentIds.has(u.id)
-                            ? "border border-gray-300 text-gray-400"
-                            : "border-2 border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent-light)]"
-                        }`}
-                      >
-                        {sentIds.has(u.id) ? "Sent" : (
-                          <>
-                            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-                            </svg>
-                            Connect
-                          </>
+                  {results.map((u) => {
+                    const isConnected = connectedIds.has(u.id);
+                    const isSent = sentIds.has(u.id);
+                    const isMe = u.id === me?.id;
+                    return (
+                      <div key={u.id} className="flex items-center gap-3">
+                        <Link href={`/profile/${u.username}`} className="flex items-center gap-3 flex-1 min-w-0">
+                          <Avatar name={u.full_name ?? u.username} />
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 truncate hover:underline">{u.full_name ?? u.username}</p>
+                            <p className="text-xs text-gray-500">@{u.username}</p>
+                          </div>
+                        </Link>
+                        {!isMe && (
+                          isConnected ? (
+                            <span className="text-xs text-gray-400 border border-gray-300 rounded-full px-3 py-1.5">Connected</span>
+                          ) : (
+                            <button
+                              onClick={() => sendRequest(u.id)}
+                              disabled={isSent}
+                              className={`flex items-center gap-1 rounded-full px-4 py-1.5 text-sm font-semibold transition-colors ${
+                                isSent
+                                  ? "border border-gray-300 text-gray-400"
+                                  : "border-2 border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent-light)]"
+                              }`}
+                            >
+                              {isSent ? "Sent" : (
+                                <>
+                                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+                                  </svg>
+                                  Connect
+                                </>
+                              )}
+                            </button>
+                          )
                         )}
-                      </button>
-                    </div>
-                  ))}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
