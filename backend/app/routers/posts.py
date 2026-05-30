@@ -126,6 +126,28 @@ def get_feed(
     return [_serialize_post(p, current_user, db) for p in page]
 
 
+@router.get("/user/{user_id}", response_model=list[PostOut])
+def get_user_posts(
+    user_id: uuid.UUID,
+    skip: int = 0,
+    limit: int = 20,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    posts = (
+        db.query(Post)
+        .filter(
+            Post.user_id == user_id,
+            or_(Post.visibility == "public", Post.user_id == current_user.id),
+        )
+        .order_by(Post.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+    return [_serialize_post(p, current_user, db) for p in posts]
+
+
 @router.get("/saved", response_model=list[PostOut])
 def get_saved_posts(
     skip: int = 0,
