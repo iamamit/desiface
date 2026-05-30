@@ -31,6 +31,14 @@ def list_requests(current_user: User = Depends(get_current_user), db: Session = 
     ).all()
 
 
+@router.get("/sent", response_model=list[ConnectionOut])
+def list_sent_requests(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return db.query(Connection).filter(
+        Connection.requester_id == current_user.id,
+        Connection.status == "pending",
+    ).all()
+
+
 @router.get("/status/{user_id}", response_model=ConnectionStatus)
 def connection_status(user_id: uuid.UUID, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     conn = db.query(Connection).filter(

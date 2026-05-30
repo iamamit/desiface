@@ -22,9 +22,9 @@ export default function ConnectionsPage() {
   const { user: me } = useAuthStore();
   const [connections, setConnections] = useState<Connection[]>([]);
   const [requests, setRequests] = useState<Connection[]>([]);
+  const [sentRequests, setSentRequests] = useState<Connection[]>([]);
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<User[]>([]);
-  const [sentIds, setSentIds] = useState<Set<string>>(new Set());
   const [sendError, setSendError] = useState<string | null>(null);
   const [tab, setTab] = useState<"friends" | "requests">("friends");
   const [acceptError, setAcceptError] = useState<string | null>(null);
@@ -32,6 +32,7 @@ export default function ConnectionsPage() {
   useEffect(() => {
     api.get<Connection[]>("/connections").then((r) => setConnections(r.data));
     api.get<Connection[]>("/connections/requests").then((r) => setRequests(r.data));
+    api.get<Connection[]>("/connections/sent").then((r) => setSentRequests(r.data));
   }, []);
 
   useEffect(() => {
@@ -46,14 +47,24 @@ export default function ConnectionsPage() {
   const connectedIds = new Set(connections.map((c) =>
     c.requester.id === me?.id ? c.addressee.id : c.requester.id
   ));
+  const pendingSentMap = new Map(sentRequests.map((c) => [c.addressee.id, c.id]));
 
   async function sendRequest(userId: string) {
     setSendError(null);
     try {
-      await api.post(`/connections/${userId}`);
-      setSentIds((prev) => new Set([...prev, userId]));
+      const { data } = await api.post<Connection>(`/connections/${userId}`);
+      setSentRequests((prev) => [...prev, data]);
     } catch {
-      setSendError("Could not send request. You may already be connected.");
+      setSendError("Could not send request.");
+    }
+  }
+
+  async function withdrawRequest(connId: string, userId: string) {
+    try {
+      await api.delete(`/connections/${connId}`);
+      setSentRequests((prev) => prev.filter((c) => c.id !== connId));
+    } catch {
+      setSendError("Could not withdraw request.");
     }
   }
 
@@ -111,7 +122,8 @@ export default function ConnectionsPage() {
                 <div className="mt-3 space-y-3">
                   {results.map((u) => {
                     const isConnected = connectedIds.has(u.id);
-                    const isSent = sentIds.has(u.id);
+                    const pendingConnId = pendingSentMap.get(u.id);
+                    const isPending = !!pendingConnId;
                     const isMe = u.id === me?.id;
                     return (
                       <div key={u.id} className="flex items-center gap-3">
@@ -125,24 +137,22 @@ export default function ConnectionsPage() {
                         {!isMe && (
                           isConnected ? (
                             <span className="text-xs text-gray-400 border border-gray-300 rounded-full px-3 py-1.5">Connected</span>
+                          ) : isPending ? (
+                            <button
+                              onClick={() => withdrawRequest(pendingConnId!, u.id)}
+                              className="text-xs border border-gray-400 text-gray-600 rounded-full px-3 py-1.5 hover:border-red-400 hover:text-red-500 transition-colors"
+                            >
+                              Withdraw
+                            </button>
                           ) : (
                             <button
                               onClick={() => sendRequest(u.id)}
-                              disabled={isSent}
-                              className={`flex items-center gap-1 rounded-full px-4 py-1.5 text-sm font-semibold transition-colors ${
-                                isSent
-                                  ? "border border-gray-300 text-gray-400"
-                                  : "border-2 border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent-light)]"
-                              }`}
+                              className="flex items-center gap-1 rounded-full px-4 py-1.5 text-sm font-semibold border-2 border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent-light)] transition-colors"
                             >
-                              {isSent ? "Sent" : (
-                                <>
-                                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-                                  </svg>
-                                  Connect
-                                </>
-                              )}
+                              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+                              </svg>
+                              Connect
                             </button>
                           )
                         )}
