@@ -72,8 +72,8 @@ test.describe("Feedback", () => {
     await page.getByRole("button", { name: "Feedback" }).click();
     await expect(page.getByRole("heading", { name: "Share feedback" })).toBeVisible();
 
-    // Click the backdrop (the semi-transparent overlay behind the modal)
-    await page.locator(".fixed.inset-0.bg-black\\/50").click();
+    // Click the backdrop (the semi-transparent overlay behind the modal content)
+    await page.locator(".absolute.inset-0.bg-black\\/50").click();
     await expect(page.getByRole("heading", { name: "Share feedback" })).not.toBeVisible({ timeout: 3000 });
   });
 });

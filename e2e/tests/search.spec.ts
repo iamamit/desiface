@@ -49,8 +49,8 @@ test.describe("Search", () => {
     await page.fill('input[placeholder="Search"]', userB.username);
     await expect(page.locator("text=@" + userB.username)).toBeVisible({ timeout: 5000 });
 
-    // Click the result
-    await page.locator("text=@" + userB.username).click();
+    // Click the result button (not just the text node inside it)
+    await page.locator("button").filter({ hasText: "@" + userB.username }).click();
     await expect(page).toHaveURL(new RegExp(`/profile/${userB.username}`));
   });
 

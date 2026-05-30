@@ -15,12 +15,14 @@ function NavItem({
   label,
   unread = 0,
   active,
+  badgeTestId,
   children,
 }: {
   href: string;
   label: string;
   unread?: number;
   active: boolean;
+  badgeTestId?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -35,7 +37,7 @@ function NavItem({
       <div className="relative">
         {children}
         {unread > 0 && (
-          <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] rounded-full min-w-[16px] h-4 flex items-center justify-center px-0.5 font-bold leading-none">
+          <span data-testid={badgeTestId} className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] rounded-full min-w-[16px] h-4 flex items-center justify-center px-0.5 font-bold leading-none">
             {unread > 9 ? "9+" : unread}
           </span>
         )}
@@ -121,7 +123,9 @@ export default function Navbar() {
   const [userResults, setUserResults] = useState<User[]>([]);
   const [postResults, setPostResults] = useState<Pick<Post, "id" | "content" | "author">[]>([]);
   const [showMore, setShowMore] = useState(false);
+  const [meMenuOpen, setMeMenuOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const meMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (user) fetchMe().catch(() => {});
@@ -152,6 +156,7 @@ export default function Navbar() {
   useEffect(() => {
     function handler(e: MouseEvent) {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) clearSearch();
+      if (meMenuRef.current && !meMenuRef.current.contains(e.target as Node)) setMeMenuOpen(false);
     }
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -246,7 +251,7 @@ export default function Navbar() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </NavItem>
-            <NavItem href="/notifications" label="Notifications" unread={unread} active={pathname === "/notifications"}>
+            <NavItem href="/notifications" label="Notifications" unread={unread} badgeTestId="notif-badge" active={pathname === "/notifications"}>
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
@@ -271,7 +276,12 @@ export default function Navbar() {
 
           {/* Desktop Me dropdown */}
           {user && (
-            <div className="hidden md:flex relative group flex-col items-center justify-center px-3 cursor-pointer text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-gray-100 min-w-[56px]">
+            <div
+              ref={meMenuRef}
+              data-testid="me-menu"
+              className="hidden md:flex relative group flex-col items-center justify-center px-3 cursor-pointer text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-gray-100 min-w-[56px]"
+              onClick={() => setMeMenuOpen((o) => !o)}
+            >
               <div className="w-7 h-7 rounded-full bg-[var(--accent)] flex items-center justify-center text-white text-xs font-bold">
                 {initials}
               </div>
@@ -281,7 +291,7 @@ export default function Navbar() {
                   <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
               </span>
-              <div className="absolute right-0 top-full w-60 bg-white dark:bg-[#242424] rounded-lg shadow-xl border border-gray-200 dark:border-[#3E3E3E] overflow-hidden hidden group-hover:block">
+              <div className={`absolute right-0 top-full w-60 bg-white dark:bg-[#242424] rounded-lg shadow-xl border border-gray-200 dark:border-[#3E3E3E] overflow-hidden group-hover:block ${meMenuOpen ? "block" : "hidden"}`}>
                 <div className="p-4 flex items-center gap-3">
                   <div className="w-14 h-14 rounded-full bg-[var(--accent)] flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                     {initials}

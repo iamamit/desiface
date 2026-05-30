@@ -46,7 +46,7 @@ test.describe("Connections", () => {
     await expect(page.getByText(userB.username, { exact: true }).first()).toBeVisible({ timeout: 5000 });
 
     await page.getByRole("button", { name: "Connect" }).click();
-    await expect(page.getByRole("button", { name: "Sent" })).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("button", { name: "Withdraw" })).toBeVisible({ timeout: 5000 });
   });
 
   test("connect from profile: button shows Withdraw request after click", async ({ page, browser }) => {
