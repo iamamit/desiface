@@ -207,12 +207,6 @@ export default function FeedPage() {
 
               {/* Action shortcuts */}
               <div className="flex items-center gap-1 border-t border-[#E0DFDC] dark:border-[#2E2E2E] pt-2">
-                <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2A2A2A] rounded transition-colors">
-                  <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M15 10l4.553-2.069A1 1 0 0121 8.868V15.13a1 1 0 01-1.447.899L15 14M3 8h12a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V9a1 1 0 011-1z" />
-                  </svg>
-                  Video
-                </button>
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
@@ -230,12 +224,6 @@ export default function FeedPage() {
                   className="hidden"
                   onChange={handleImageSelect}
                 />
-                <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors">
-                  <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  Write article
-                </button>
               </div>
             </div>
 
