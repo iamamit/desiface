@@ -1,6 +1,10 @@
 import json
+import logging
 import os
+from contextlib import asynccontextmanager
 
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -13,10 +17,23 @@ from app.core.config import settings
 from app.core.database import SessionLocal
 from app.models.error_log import ErrorLog
 from app.routers import admin, auth, connections, feedback, groups, jobs, messages, notifications, posts, programs, search, services, users, ws
+from app.services.news_scraper import run_news_scraper
 
+logger = logging.getLogger(__name__)
 limiter = Limiter(key_func=get_remote_address)
+_scheduler = BackgroundScheduler()
 
-app = FastAPI(title="Desiface API", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    _scheduler.add_job(run_news_scraper, CronTrigger(hour=8, minute=0), id="news_scraper", replace_existing=True)
+    _scheduler.start()
+    logger.info("News scraper scheduled (daily 08:00)")
+    yield
+    _scheduler.shutdown(wait=False)
+
+
+app = FastAPI(title="Desiface API", version="0.1.0", lifespan=lifespan)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
