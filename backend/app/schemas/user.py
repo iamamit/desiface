@@ -1,13 +1,20 @@
 import uuid
 from datetime import datetime
+from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class UserUpdate(BaseModel):
-    full_name: str | None = None
-    bio: str | None = None
+    full_name: str | None = Field(None, max_length=100)
+    bio: str | None = Field(None, max_length=2000)
     avatar_url: str | None = None
+    cover_url: str | None = None
+    headline: str | None = Field(None, max_length=220)
+    location: str | None = Field(None, max_length=100)
+    work_experience: list[Any] | None = None
+    education: list[Any] | None = None
+    skills: list[str] | None = None
     profile_visibility: str | None = None
 
 
@@ -18,7 +25,14 @@ class UserPublic(BaseModel):
     full_name: str | None
     bio: str | None
     avatar_url: str | None
+    cover_url: str | None = None
+    headline: str | None = None
+    location: str | None = None
+    work_experience: list[Any] | None = None
+    education: list[Any] | None = None
+    skills: list[str] | None = None
     is_verified: bool
+    is_admin: bool = False
     profile_visibility: str = "public"
     created_at: datetime
 

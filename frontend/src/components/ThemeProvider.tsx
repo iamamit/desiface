@@ -3,7 +3,7 @@
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
-type AccentTheme = "blue" | "heritage";
+type AccentTheme = "teal" | "blue" | "heritage";
 
 interface AccentContextValue {
   accent: AccentTheme;
@@ -11,7 +11,7 @@ interface AccentContextValue {
 }
 
 const AccentContext = createContext<AccentContextValue>({
-  accent: "blue",
+  accent: "teal",
   setAccent: () => {},
 });
 
@@ -20,10 +20,10 @@ export function useAccentTheme() {
 }
 
 function AccentProvider({ children }: { children: React.ReactNode }) {
-  const [accent, setAccentState] = useState<AccentTheme>("blue");
+  const [accent, setAccentState] = useState<AccentTheme>("teal");
 
   useEffect(() => {
-    const saved = (localStorage.getItem("accent-theme") as AccentTheme) ?? "blue";
+    const saved = (localStorage.getItem("accent-theme") as AccentTheme) ?? "teal";
     setAccentState(saved);
     document.documentElement.setAttribute("data-accent", saved);
   }, []);

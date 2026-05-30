@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { login, logout, makeUser, register } from "./helpers";
+import { makeUser, register } from "./helpers";
 
 test.describe("Profile", () => {
   test("own profile: shows username and Edit profile button", async ({ page }) => {
@@ -28,7 +28,7 @@ test.describe("Profile", () => {
     await page.getByRole("button", { name: "Edit profile" }).click();
 
     // Modal should be open
-    await expect(page.locator("text=Edit intro")).toBeVisible();
+    await expect(page.getByTestId("edit-profile-modal")).toBeVisible();
 
     const bio = `Bio set by Playwright at ${Date.now()}`;
     await page.locator('textarea[placeholder="Tell people a little about yourself"]').fill(bio);
@@ -72,14 +72,14 @@ test.describe("Profile", () => {
     await register(page, user);
 
     await page.goto("/profile/this_user_does_not_exist_xyz987");
-    await expect(page.locator("text=not found")).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId("not-found-message")).toBeVisible({ timeout: 5000 });
   });
 
   test("navbar profile link: navigates to own profile", async ({ page }) => {
     const user = makeUser();
     await register(page, user);
 
-    await page.locator("nav .group").hover();
+    await page.getByTestId("me-menu").click();
     await page.getByRole("link", { name: "View Profile" }).click();
 
     await expect(page).toHaveURL(new RegExp(`/profile/${user.username}`));

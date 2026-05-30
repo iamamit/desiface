@@ -16,11 +16,11 @@ test.describe("Real-time chat (WebSocket)", () => {
 
     // userA opens chat with userB
     await page.goto(`/messages/${userB.username}`);
-    await expect(page.locator('input[placeholder="Type a message…"]')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator("text=@" + userB.username).first()).toBeVisible({ timeout: 5000 });
 
     // userB opens chat with userA
     await pageB.goto(`/messages/${userA.username}`);
-    await expect(pageB.locator('input[placeholder="Type a message…"]')).toBeVisible({ timeout: 5000 });
+    await expect(pageB.locator("text=@" + userA.username).first()).toBeVisible({ timeout: 5000 });
 
     // userA sends a message
     const msg = `Hello realtime ${Date.now()}`;
@@ -46,10 +46,9 @@ test.describe("Real-time chat (WebSocket)", () => {
     await register(page, userA);
 
     await page.goto(`/messages/${userB.username}`);
+    await expect(page.locator("text=@" + userB.username).first()).toBeVisible({ timeout: 5000 });
     await pageB.goto(`/messages/${userA.username}`);
-
-    await expect(page.locator('input[placeholder="Type a message…"]')).toBeVisible({ timeout: 5000 });
-    await expect(pageB.locator('input[placeholder="Type a message…"]')).toBeVisible({ timeout: 5000 });
+    await expect(pageB.locator("text=@" + userA.username).first()).toBeVisible({ timeout: 5000 });
 
     const ts = Date.now();
     for (const msg of [`first_${ts}`, `second_${ts}`, `third_${ts}`]) {
@@ -76,10 +75,9 @@ test.describe("Real-time chat (WebSocket)", () => {
     await register(page, userA);
 
     await page.goto(`/messages/${userB.username}`);
+    await expect(page.locator("text=@" + userB.username).first()).toBeVisible({ timeout: 5000 });
     await pageB.goto(`/messages/${userA.username}`);
-
-    await expect(page.locator('input[placeholder="Type a message…"]')).toBeVisible({ timeout: 5000 });
-    await expect(pageB.locator('input[placeholder="Type a message…"]')).toBeVisible({ timeout: 5000 });
+    await expect(pageB.locator("text=@" + userA.username).first()).toBeVisible({ timeout: 5000 });
 
     const ts = Date.now();
     const msgA = `from_A_${ts}`;

@@ -39,7 +39,7 @@ test.describe("Avatar upload", () => {
     fs.writeFileSync(tmpPath, Buffer.from(PNG_BASE64, "base64"));
 
     // Set avatar file input
-    const avatarInput = page.locator('input[type="file"]').first();
+    const avatarInput = page.getByTestId("avatar-input");
     await avatarInput.setInputFiles(tmpPath);
 
     // A preview image should appear in the modal
