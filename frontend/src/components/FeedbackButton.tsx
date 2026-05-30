@@ -65,7 +65,6 @@ export default function FeedbackButton() {
       <button
         onClick={() => { setOpen(true); reset(); }}
         className="fixed bottom-20 right-4 md:bottom-6 z-30 flex items-center gap-2 bg-[var(--accent)] text-white text-xs font-semibold px-3 py-2 rounded-full shadow-lg hover:opacity-90 transition-opacity"
-        aria-label="Send feedback"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />

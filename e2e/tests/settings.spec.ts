@@ -7,7 +7,7 @@ test.describe("Settings", () => {
     const user = makeUser();
     await register(page, user);
 
-    await page.locator("nav .group").hover();
+    await page.getByTestId("me-menu").click();
     await page.getByRole("link", { name: "Settings" }).click();
 
     await expect(page).toHaveURL(/\/settings/);

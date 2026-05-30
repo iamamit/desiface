@@ -96,7 +96,7 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-[var(--bg-base)]">
         <Navbar />
         <div className="flex items-center justify-center py-20">
-          <p className="text-gray-500">User <span className="font-semibold">@{username}</span> not found.</p>
+          <p className="text-gray-500" data-testid="not-found-message">User <span className="font-semibold">@{username}</span> not found.</p>
         </div>
       </div>
     );
