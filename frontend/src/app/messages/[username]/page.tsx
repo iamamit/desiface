@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import Navbar from "@/components/Navbar";
@@ -12,6 +11,7 @@ import type { User } from "@/types/user";
 
 export default function ConversationPage() {
   const { username } = useParams<{ username: string }>();
+  const router = useRouter();
   const { user: me, token } = useAuthStore();
   const [other, setOther] = useState<User | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -104,7 +104,10 @@ export default function ConversationPage() {
           {/* Chat header */}
           {other && (
             <div className="px-4 py-3 border-b border-[#E0DFDC] flex items-center gap-3">
-              <Link href={`/profile/${other.username}`} className="flex items-center gap-3 hover:opacity-80">
+              <button
+                onClick={() => router.push(`/profile/${other.username}`)}
+                className="flex items-center gap-3 hover:opacity-80 cursor-pointer text-left"
+              >
                 <div className="w-10 h-10 rounded-full bg-[var(--accent-light)] flex items-center justify-center text-[var(--accent)] font-bold text-sm">
                   {otherInitials}
                 </div>
@@ -112,7 +115,7 @@ export default function ConversationPage() {
                   <p className="text-sm font-semibold text-gray-900 hover:underline">{other.full_name ?? other.username}</p>
                   <p className="text-xs text-gray-400">@{other.username}</p>
                 </div>
-              </Link>
+              </button>
               <div className="ml-auto flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-green-400" />
                 <span className="text-xs text-gray-500">Online</span>
