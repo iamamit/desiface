@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import api from "@/lib/api";
 import { useAuthStore } from "@/store/auth";
@@ -9,7 +9,10 @@ type FeedbackType = "feedback" | "bug";
 
 export default function FeedbackButton() {
   const { user } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
   const [type, setType] = useState<FeedbackType>("feedback");
   const [message, setMessage] = useState("");
   const [screenshot, setScreenshot] = useState<File | null>(null);
@@ -18,7 +21,7 @@ export default function FeedbackButton() {
   const [done, setDone] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  if (!user) return null;
+  if (!mounted || !user) return null;
 
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
