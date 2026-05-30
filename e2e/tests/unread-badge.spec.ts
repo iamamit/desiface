@@ -29,16 +29,10 @@ test.describe("Unread message badge", () => {
     const ctxB = await browser.newContext();
     const pageB = await ctxB.newPage();
     await register(pageB, userB);
-    const tokenB = await pageB.evaluate(() => localStorage.getItem("access_token"));
 
-    // UserB sends a message to userA via API
-    await pageB.request.post(`http://localhost:8000/messages/${(await page.request.get(`http://localhost:8000/users/${userA.username}`, { headers: { Authorization: `Bearer ${tokenA}` } })).json().then(r => r.id)}`, {
-      data: { content: "Hello userA!" },
-      headers: { Authorization: `Bearer ${tokenB}` },
-    }).catch(() => {});
-
-    // Use the messages page instead (to also test the UI)
+    // userB sends a message to userA via the UI
     await pageB.goto(`/messages/${userA.username}`);
+    await expect(pageB.locator("text=@" + userA.username).first()).toBeVisible({ timeout: 5000 });
     await pageB.fill('input[placeholder="Type a message…"]', "Hey userA!");
     await pageB.getByRole("button", { name: "Send" }).click();
     await expect(pageB.locator("text=Hey userA!")).toBeVisible({ timeout: 5000 });

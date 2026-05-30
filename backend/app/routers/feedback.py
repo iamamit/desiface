@@ -10,7 +10,7 @@ from app.models.feedback import Feedback
 from app.models.user import User
 from app.routers.auth import get_current_user
 
-UPLOAD_DIR = "/app/uploads"
+UPLOAD_DIR = os.environ.get("UPLOAD_DIR", "/app/uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 router = APIRouter(prefix="/feedback", tags=["feedback"])

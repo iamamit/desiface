@@ -41,6 +41,12 @@ async function otpSignIn(page: Page, email: string) {
 
 export async function register(page: Page, user: ReturnType<typeof makeUser>) {
   await otpSignIn(page, user.email);
+  // Dismiss onboarding modal if shown for new users
+  try {
+    await page.getByRole("button", { name: "Skip for now" }).click({ timeout: 2000 });
+  } catch {
+    // Modal not shown or already dismissed — that's fine
+  }
 }
 
 export async function login(page: Page, user: ReturnType<typeof makeUser>) {
@@ -48,7 +54,12 @@ export async function login(page: Page, user: ReturnType<typeof makeUser>) {
 }
 
 export async function logout(page: Page) {
-  await page.locator("nav .group").hover();
-  await page.getByRole("button", { name: "Sign out" }).click();
+  // Clear all auth state: raw token, Zustand persist key, and cookie
+  await page.evaluate(() => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("auth"); // Zustand persist key (name: "auth")
+    document.cookie = "access_token=; path=/; max-age=0";
+  });
+  await page.goto("/login");
   await page.waitForURL("**/login");
 }

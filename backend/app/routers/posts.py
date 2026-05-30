@@ -27,7 +27,7 @@ from app.schemas.post import (
     ReactionSummary,
 )
 
-UPLOAD_DIR = "/app/uploads"
+UPLOAD_DIR = os.environ.get("UPLOAD_DIR", "/app/uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 VALID_TAGS = {
