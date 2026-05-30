@@ -6,11 +6,13 @@ import { useEffect, useState } from "react";
 import EditProfileModal from "@/components/EditProfileModal";
 import LeftSidebar from "@/components/LeftSidebar";
 import Navbar from "@/components/Navbar";
+import PostCard from "@/components/PostCard";
 import api from "@/lib/api";
 import { mediaUrl } from "@/lib/media";
 import { useAuthStore } from "@/store/auth";
 import type { ConnectionStatus } from "@/types/connection";
 import type { Service } from "@/types/community";
+import type { Post } from "@/types/post";
 import type { User } from "@/types/user";
 
 function formatMonthYear(date: string | null | undefined): string {
@@ -30,6 +32,7 @@ export default function ProfilePage() {
   const [connStatus, setConnStatus] = useState<ConnectionStatus | null>(null);
   const [connecting, setConnecting] = useState(false);
   const [profileServices, setProfileServices] = useState<Service[]>([]);
+  const [userPosts, setUserPosts] = useState<Post[]>([]);
 
   const isOwner = me?.username === username;
 
@@ -41,6 +44,9 @@ export default function ProfilePage() {
         setProfile(r.data);
         api.get<Service[]>(`/services?user_id=${r.data.id}`)
           .then((s) => { if (!cancelled) setProfileServices(s.data); })
+          .catch(() => {});
+        api.get<Post[]>(`/posts/user/${r.data.id}`)
+          .then((p) => { if (!cancelled) setUserPosts(p.data); })
           .catch(() => {});
         if (me && me.username !== username) {
           return api.get<ConnectionStatus>(`/connections/status/${r.data.id}`);
@@ -346,10 +352,18 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {/* Activity placeholder */}
-            <div className="bg-white dark:bg-[#1c1c1c] rounded-lg border border-[#E0DFDC] dark:border-[#2E2E2E] p-6 text-center text-gray-400 text-sm">
-              No posts yet.
-            </div>
+            {/* Posts */}
+            {userPosts.length === 0 ? (
+              <div className="bg-white dark:bg-[#1c1c1c] rounded-lg border border-[#E0DFDC] dark:border-[#2E2E2E] p-6 text-center text-gray-400 text-sm">
+                No posts yet.
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {userPosts.map((post) => (
+                  <PostCard key={post.id} post={post} onDeleted={(id) => setUserPosts((ps) => ps.filter((p) => p.id !== id))} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
