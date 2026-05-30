@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import LeftSidebar from "@/components/LeftSidebar";
@@ -97,11 +98,13 @@ export default function ConnectionsPage() {
                 <div className="mt-3 space-y-3">
                   {results.map((u) => (
                     <div key={u.id} className="flex items-center gap-3">
-                      <Avatar name={u.full_name ?? u.username} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 truncate">{u.full_name ?? u.username}</p>
-                        <p className="text-xs text-gray-500">@{u.username}</p>
-                      </div>
+                      <Link href={`/profile/${u.username}`} className="flex items-center gap-3 flex-1 min-w-0">
+                        <Avatar name={u.full_name ?? u.username} />
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 truncate hover:underline">{u.full_name ?? u.username}</p>
+                          <p className="text-xs text-gray-500">@{u.username}</p>
+                        </div>
+                      </Link>
                       <button
                         onClick={() => sendRequest(u.id)}
                         disabled={sentIds.has(u.id)}
@@ -153,11 +156,13 @@ export default function ConnectionsPage() {
                     const other = c.requester.id === me?.id ? c.addressee : c.requester;
                     return (
                       <div key={c.id} className="flex items-center gap-3 px-4 py-3 border-b border-[#E0DFDC] last:border-0 hover:bg-gray-50">
-                        <Avatar name={other.full_name ?? other.username} />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-gray-900 truncate">{other.full_name ?? other.username}</p>
-                          <p className="text-xs text-gray-500">@{other.username}</p>
-                        </div>
+                        <Link href={`/profile/${other.username}`} className="flex items-center gap-3 flex-1 min-w-0">
+                          <Avatar name={other.full_name ?? other.username} />
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 truncate hover:underline">{other.full_name ?? other.username}</p>
+                            <p className="text-xs text-gray-500">@{other.username}</p>
+                          </div>
+                        </Link>
                         <button onClick={() => unfriend(c.id)} className="text-xs text-gray-400 hover:text-red-400 border border-gray-300 rounded-full px-3 py-1 transition-colors">
                           Remove
                         </button>
@@ -177,11 +182,13 @@ export default function ConnectionsPage() {
                     <div className="p-8 text-center text-sm text-gray-400">No pending requests.</div>
                   ) : requests.map((r) => (
                     <div key={r.id} className="flex items-center gap-3 px-4 py-3 border-b border-[#E0DFDC] last:border-0 hover:bg-gray-50">
-                      <Avatar name={r.requester.full_name ?? r.requester.username} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 truncate">{r.requester.full_name ?? r.requester.username}</p>
-                        <p className="text-xs text-gray-500">@{r.requester.username}</p>
-                      </div>
+                      <Link href={`/profile/${r.requester.username}`} className="flex items-center gap-3 flex-1 min-w-0">
+                        <Avatar name={r.requester.full_name ?? r.requester.username} />
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 truncate hover:underline">{r.requester.full_name ?? r.requester.username}</p>
+                          <p className="text-xs text-gray-500">@{r.requester.username}</p>
+                        </div>
+                      </Link>
                       <div className="flex gap-2">
                         <button onClick={() => accept(r.id)} className="rounded-full gradient-accent px-4 py-1.5 text-sm font-semibold text-white hover:opacity-90 transition-colors">Accept</button>
                         <button onClick={() => decline(r.id)} className="rounded-full border-2 border-gray-400 px-4 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Ignore</button>
