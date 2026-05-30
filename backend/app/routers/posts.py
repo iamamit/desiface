@@ -2,6 +2,7 @@ import os
 import re
 import uuid
 from collections import Counter
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy import or_
@@ -80,6 +81,14 @@ def _serialize_post(post: Post, me: User, db: Session) -> PostOut:
     )
 
 
+def _feed_score(post: Post, friend_ids: set, viewer_id: uuid.UUID, now: datetime) -> float:
+    age_hours = max((now - post.created_at.replace(tzinfo=timezone.utc)).total_seconds() / 3600, 0)
+    recency = 1.0 / ((age_hours + 2) ** 1.5)
+    engagement = len(post.likes) * 2 + len(post.comments) * 3
+    connection_boost = 1.5 if post.user_id in friend_ids and post.user_id != viewer_id else 1.0
+    return (recency + engagement * 0.05) * connection_boost
+
+
 @router.get("/feed", response_model=list[PostOut])
 def get_feed(
     skip: int = 0,
@@ -100,18 +109,21 @@ def get_feed(
         friend_ids.add(c.requester_id if c.addressee_id == current_user.id else c.addressee_id)
     friend_ids.add(current_user.id)
 
-    posts = (
+    pool = (
         db.query(Post)
         .filter(
             Post.user_id.in_(friend_ids),
             or_(Post.visibility == "public", Post.user_id == current_user.id),
         )
         .order_by(Post.created_at.desc())
-        .offset(skip)
-        .limit(limit)
+        .limit(max(200, skip + limit + 50))
         .all()
     )
-    return [_serialize_post(p, current_user, db) for p in posts]
+
+    now = datetime.now(timezone.utc)
+    ranked = sorted(pool, key=lambda p: _feed_score(p, friend_ids, current_user.id, now), reverse=True)
+    page = ranked[skip: skip + limit]
+    return [_serialize_post(p, current_user, db) for p in page]
 
 
 @router.get("/saved", response_model=list[PostOut])

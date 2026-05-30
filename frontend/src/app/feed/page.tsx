@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import LeftSidebar from "@/components/LeftSidebar";
 import Navbar from "@/components/Navbar";
@@ -38,16 +38,43 @@ export default function FeedPage() {
   const [selectedTag, setSelectedTag] = useState<PostTag | null>(null);
   const [filterTag, setFilterTag] = useState<PostTag | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [skip, setSkip] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const LIMIT = 20;
 
   const needsOnboarding = !!user && !user.avatar_url && !user.headline &&
     !localStorage.getItem(`onboarding_done_${user.id}`);
   const [showOnboarding, setShowOnboarding] = useState(needsOnboarding);
 
   useEffect(() => {
-    api.get<Post[]>("/posts/feed")
-      .then((r) => setPosts(r.data))
+    api.get<Post[]>(`/posts/feed?skip=0&limit=${LIMIT}`)
+      .then((r) => { setPosts(r.data); setHasMore(r.data.length === LIMIT); })
       .finally(() => setLoading(false));
   }, []);
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const nextSkip = skip + LIMIT;
+    try {
+      const r = await api.get<Post[]>(`/posts/feed?skip=${nextSkip}&limit=${LIMIT}`);
+      setPosts((prev) => [...prev, ...r.data]);
+      setSkip(nextSkip);
+      setHasMore(r.data.length === LIMIT);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [skip, hasMore, loadingMore]);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) loadMore(); }, { rootMargin: "200px" });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loadMore]);
 
   function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -254,15 +281,26 @@ export default function FeedPage() {
                 </p>
               </div>
             ) : (
-              visiblePosts.map((p) => (
-                <PostCard
-                  key={p.id}
-                  post={p}
-                  onDeleted={(id) => setPosts((prev) => prev.filter((x) => x.id !== id))}
-                  onUpdated={(updated) => setPosts((prev) => prev.map((x) => x.id === updated.id ? updated : x))}
-                  onShared={(newPost) => setPosts((prev) => [newPost, ...prev])}
-                />
-              ))
+              <>
+                {visiblePosts.map((p) => (
+                  <PostCard
+                    key={p.id}
+                    post={p}
+                    onDeleted={(id) => setPosts((prev) => prev.filter((x) => x.id !== id))}
+                    onUpdated={(updated) => setPosts((prev) => prev.map((x) => x.id === updated.id ? updated : x))}
+                    onShared={(newPost) => setPosts((prev) => [newPost, ...prev])}
+                  />
+                ))}
+                <div ref={sentinelRef} className="h-4" />
+                {loadingMore && (
+                  <div className="flex justify-center py-4">
+                    <div className="w-6 h-6 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
+                {!hasMore && posts.length > 0 && (
+                  <p className="text-center text-xs text-gray-400 py-4">You've seen all posts</p>
+                )}
+              </>
             )}
           </div>
 
