@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import LeftSidebar from "@/components/LeftSidebar";
 import Navbar from "@/components/Navbar";
+import OnboardingModal from "@/components/OnboardingModal";
 import PostCard from "@/components/PostCard";
 import RightSidebar from "@/components/RightSidebar";
 import api from "@/lib/api";
@@ -37,6 +38,10 @@ export default function FeedPage() {
   const [selectedTag, setSelectedTag] = useState<PostTag | null>(null);
   const [filterTag, setFilterTag] = useState<PostTag | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const needsOnboarding = !!user && !user.avatar_url && !user.headline &&
+    !localStorage.getItem(`onboarding_done_${user.id}`);
+  const [showOnboarding, setShowOnboarding] = useState(needsOnboarding);
 
   useEffect(() => {
     api.get<Post[]>("/posts/feed")
@@ -86,6 +91,7 @@ export default function FeedPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)] dark:bg-[#111111]">
+      {showOnboarding && <OnboardingModal onDone={() => setShowOnboarding(false)} />}
       <Navbar />
       <div className="max-w-[1080px] mx-auto px-4 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr_300px] gap-4">
