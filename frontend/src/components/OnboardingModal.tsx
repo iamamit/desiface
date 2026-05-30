@@ -201,7 +201,7 @@ export default function OnboardingModal({ onDone }: Props) {
                   <div key={s.id} className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden flex-shrink-0">
                       {s.avatar_url
-                        ? <img src={mediaUrl(s.avatar_url)} className="w-full h-full object-cover" alt="" />
+                        ? <img src={mediaUrl(s.avatar_url!)} className="w-full h-full object-cover" alt="" />
                         : <div className="w-full h-full flex items-center justify-center text-sm font-bold text-gray-500">{(s.full_name || s.username)[0].toUpperCase()}</div>
                       }
                     </div>
