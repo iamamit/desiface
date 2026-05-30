@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import LeftSidebar from "@/components/LeftSidebar";
@@ -94,14 +95,14 @@ export default function NotificationsPage() {
                         !n.is_read ? "bg-[var(--accent-light)]" : ""
                       }`}
                     >
-                      <div className="relative flex-shrink-0">
+                      <Link href={`/profile/${n.actor.username}`} className="relative flex-shrink-0">
                         <div className="w-12 h-12 rounded-full bg-[var(--accent-light)] flex items-center justify-center text-[var(--accent)] font-bold text-sm">
                           {(n.actor.full_name ?? n.actor.username).slice(0, 2).toUpperCase()}
                         </div>
                         <span className="absolute -bottom-0.5 -right-0.5 text-base">
                           {notifIcon(n.type)}
                         </span>
-                      </div>
+                      </Link>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-gray-800">{notifText(n)}</p>
                         <p className="text-xs text-gray-400 mt-0.5">
