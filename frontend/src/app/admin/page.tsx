@@ -61,9 +61,12 @@ export default function AdminPage() {
   const [filterCode, setFilterCode] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [clearing, setClearing] = useState(false);
-  const [tab, setTab] = useState<"overview" | "errors" | "users">("overview");
+  const [tab, setTab] = useState<"overview" | "errors" | "users" | "feedback">("overview");
 
   const [adminUsers, setAdminUsers] = useState<{ total: number; items: { id: string; email: string; username: string; full_name: string | null; is_admin: boolean; is_active: boolean; created_at: string }[] } | null>(null);
+
+  const [feedbackItems, setFeedbackItems] = useState<{ total: number; items: { id: string; type: string; message: string; screenshot_url: string | null; is_resolved: boolean; created_at: string; user_username: string; user_full_name: string | null }[] } | null>(null);
+  const [feedbackFilter, setFeedbackFilter] = useState<"all" | "feedback" | "bug" | "open">("open");
 
   useEffect(() => {
     if (user && !user.is_admin) {
@@ -87,6 +90,30 @@ export default function AdminPage() {
       api.get("/admin/users?limit=100").then((r) => setAdminUsers(r.data));
     }
   }, [tab, adminUsers, user]);
+
+  useEffect(() => {
+    if (tab === "feedback" && user?.is_admin) {
+      loadFeedback(feedbackFilter);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab, feedbackFilter, user]);
+
+  async function loadFeedback(filter: typeof feedbackFilter) {
+    let url = "/feedback?limit=100";
+    if (filter === "bug") url += "&type=bug";
+    if (filter === "feedback") url += "&type=feedback";
+    if (filter === "open") url += "&is_resolved=false";
+    const r = await api.get(url);
+    setFeedbackItems(r.data);
+  }
+
+  async function toggleResolve(id: string, current: boolean) {
+    await api.patch(`/feedback/${id}/resolve`);
+    setFeedbackItems((prev) => prev ? {
+      ...prev,
+      items: prev.items.map((f) => f.id === id ? { ...f, is_resolved: !current } : f),
+    } : prev);
+  }
 
   async function loadErrors(code?: string) {
     const url = code ? `/admin/errors?limit=100&status_code=${code}` : "/admin/errors?limit=100";
@@ -127,7 +154,7 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <div className="flex gap-1 mb-6 border-b border-[#E0DFDC] dark:border-[#2E2E2E]">
-          {(["overview", "errors", "users"] as const).map((t) => (
+          {(["overview", "errors", "users", "feedback"] as const).map((t) => (
             <button key={t} onClick={() => setTab(t)}
               className={`px-4 py-2 text-sm font-medium capitalize border-b-2 transition-colors ${tab === t ? "border-[var(--accent)] text-[var(--accent)]" : "border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}>
               {t}
@@ -320,6 +347,59 @@ export default function AdminPage() {
                       </div>
                     </div>
                   </>
+                )}
+              </div>
+            )}
+            {/* FEEDBACK */}
+            {tab === "feedback" && (
+              <div>
+                <div className="flex items-center gap-2 mb-4 flex-wrap">
+                  {(["open", "all", "feedback", "bug"] as const).map((f) => (
+                    <button key={f} onClick={() => setFeedbackFilter(f)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${feedbackFilter === f ? "bg-[var(--accent)] text-white border-[var(--accent)]" : "border-gray-300 dark:border-[#3E3E3E] text-gray-600 dark:text-gray-400 hover:border-[var(--accent)]"}`}>
+                      {f === "open" ? "Open" : f === "all" ? "All" : f === "feedback" ? "Feedback" : "Bugs"}
+                    </button>
+                  ))}
+                  <span className="ml-auto text-xs text-gray-400 dark:text-gray-500">{feedbackItems?.total ?? 0} items</span>
+                </div>
+
+                {!feedbackItems ? (
+                  <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="bg-white dark:bg-[#1c1c1c] rounded-lg border border-[#E0DFDC] dark:border-[#2E2E2E] p-4 animate-pulse h-20" />)}</div>
+                ) : feedbackItems.items.length === 0 ? (
+                  <div className="bg-white dark:bg-[#1c1c1c] rounded-lg border border-[#E0DFDC] dark:border-[#2E2E2E] p-10 text-center">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">No feedback yet.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {feedbackItems.items.map((fb) => (
+                      <div key={fb.id} className={`bg-white dark:bg-[#1c1c1c] rounded-lg border ${fb.is_resolved ? "border-[#E0DFDC] dark:border-[#2E2E2E] opacity-60" : "border-[#E0DFDC] dark:border-[#2E2E2E]"} p-4`}>
+                        <div className="flex items-start gap-3">
+                          <span className={`flex-shrink-0 inline-block px-2 py-0.5 rounded text-xs font-semibold ${fb.type === "bug" ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400" : "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"}`}>
+                            {fb.type === "bug" ? "Bug" : "Feedback"}
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                              <span className="font-medium text-gray-700 dark:text-gray-300">{fb.user_full_name ?? fb.user_username}</span>
+                              {" · @"}{fb.user_username}
+                              {" · "}{new Date(fb.created_at).toLocaleString()}
+                            </p>
+                            <p className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{fb.message}</p>
+                            {fb.screenshot_url && (
+                              <a href={fb.screenshot_url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block">
+                                <img src={fb.screenshot_url} alt="screenshot" className="max-h-40 rounded-lg border border-gray-200 dark:border-gray-600 object-contain" />
+                              </a>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => toggleResolve(fb.id, fb.is_resolved)}
+                            className={`flex-shrink-0 text-xs px-3 py-1 rounded-full border transition-colors ${fb.is_resolved ? "border-gray-300 dark:border-gray-600 text-gray-500 hover:border-[var(--accent)] hover:text-[var(--accent)]" : "border-green-400 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"}`}
+                          >
+                            {fb.is_resolved ? "Reopen" : "Resolve"}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             )}

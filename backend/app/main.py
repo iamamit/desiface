@@ -12,7 +12,7 @@ from slowapi.util import get_remote_address
 from app.core.config import settings
 from app.core.database import SessionLocal
 from app.models.error_log import ErrorLog
-from app.routers import admin, auth, connections, groups, jobs, messages, notifications, posts, programs, search, services, users, ws
+from app.routers import admin, auth, connections, feedback, groups, jobs, messages, notifications, posts, programs, search, services, users, ws
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -95,6 +95,7 @@ app.include_router(programs.router)
 app.include_router(jobs.router)
 app.include_router(groups.router)
 app.include_router(ws.router)
+app.include_router(feedback.router)
 app.include_router(admin.router)
 
 UPLOAD_DIR = "/app/uploads"
