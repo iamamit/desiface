@@ -3,7 +3,7 @@ import logging
 import os
 from contextlib import asynccontextmanager
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,7 +21,7 @@ from app.services.news_scraper import run_news_scraper
 
 logger = logging.getLogger(__name__)
 limiter = Limiter(key_func=get_remote_address)
-_scheduler = AsyncIOScheduler()
+_scheduler = BackgroundScheduler()
 
 
 @asynccontextmanager
