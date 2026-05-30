@@ -74,13 +74,10 @@ jobs:
         working-directory: frontend
         run: npx tsc --noEmit
 
-  # ── 3. Playwright E2E tests (only required for PRs into main) ───────────────
+  # ── 3. Playwright E2E tests ──────────────────────────────────────────────────
   e2e-tests:
     name: Playwright E2E
     runs-on: ubuntu-latest
-    # Only block merging to main; for develop it runs but is informational
-    # (set required in GitHub branch protection for main only)
-    if: github.base_ref == 'main' || github.base_ref == 'develop'
 
     services:
       postgres:
@@ -112,56 +109,66 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
+      # Install everything before starting services
       - name: Install backend dependencies
         working-directory: backend
         run: pip install -r requirements.txt
-
-      - name: Run Alembic migrations
-        working-directory: backend
-        env:
-          DATABASE_URL: postgresql://desiface:desiface@localhost:5432/desiface
-          SECRET_KEY: "ci-e2e-secret-key"
-          DEV_MODE: "True"
-        run: alembic upgrade head
-
-      - name: Start backend
-        working-directory: backend
-        env:
-          DATABASE_URL: postgresql://desiface:desiface@localhost:5432/desiface
-          SECRET_KEY: "ci-e2e-secret-key"
-          DEV_MODE: "True"
-          UPLOAD_DIR: /tmp/uploads
-          CORS_ORIGINS: '["http://localhost:3001"]'
-        run: uvicorn app.main:app --host 0.0.0.0 --port 8000 &
 
       - name: Install frontend dependencies
         working-directory: frontend
         run: npm ci
 
-      - name: Start frontend dev server
-        working-directory: frontend
-        env:
-          NEXT_PUBLIC_API_URL: http://localhost:8000
-          NEXT_PUBLIC_WS_URL: ws://localhost:8000
-        run: npm run dev &
-
-      - name: Wait for services to be ready
-        run: |
-          npx wait-on http://localhost:8000/health http://localhost:3001 --timeout 60000
+      - name: Install e2e dependencies
+        working-directory: e2e
+        run: npm ci
 
       - name: Install Playwright browsers
         working-directory: e2e
         run: npx playwright install chromium --with-deps
 
-      - name: Install e2e dependencies
-        working-directory: e2e
-        run: npm ci
+      # Run DB migrations
+      - name: Run Alembic migrations
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql://desiface:desiface@localhost:5432/desiface
+          SECRET_KEY: ci-e2e-secret-key
+          DEV_MODE: "True"
+          UPLOAD_DIR: /tmp/uploads
+        run: alembic upgrade head
+
+      # Start backend in background, log to file
+      - name: Start backend
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql://desiface:desiface@localhost:5432/desiface
+          SECRET_KEY: ci-e2e-secret-key
+          DEV_MODE: "True"
+          UPLOAD_DIR: /tmp/uploads
+          CORS_ORIGINS: '["http://localhost:3001"]'
+        run: nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 > /tmp/backend.log 2>&1 &
+
+      # Start Next.js dev server in background, log to file
+      - name: Start frontend dev server
+        working-directory: frontend
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:8000
+          NEXT_PUBLIC_WS_URL: ws://localhost:8000
+        run: nohup npm run dev > /tmp/frontend.log 2>&1 &
+
+      - name: Wait for services to be ready
+        run: npx wait-on http://localhost:8000/health http://localhost:3001 --timeout 120000
 
       - name: Run Playwright tests
         working-directory: e2e
-        env:
-          BASE_URL: http://localhost:3001
         run: npx playwright test
+
+      - name: Print backend log on failure
+        if: failure()
+        run: cat /tmp/backend.log || true
+
+      - name: Print frontend log on failure
+        if: failure()
+        run: cat /tmp/frontend.log || true
 
       - name: Upload Playwright report
         if: always()
