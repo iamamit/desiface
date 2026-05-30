@@ -16,7 +16,7 @@ from app.schemas.user import UserPublic, UserUpdate
 
 router = APIRouter(prefix="/users", tags=["users"])
 
-UPLOAD_DIR = "/app/uploads"
+UPLOAD_DIR = os.environ.get("UPLOAD_DIR", "/app/uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 

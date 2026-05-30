@@ -24,7 +24,7 @@ test.describe("Notifications", () => {
     await register(page, userA);
     await page.goto(`/profile/${userB.username}`);
     await page.getByRole("button", { name: "Connect" }).click();
-    await expect(page.getByRole("button", { name: "Request sent" })).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("button", { name: "Withdraw request" })).toBeVisible({ timeout: 5000 });
 
     // userB checks notifications
     await pageB.goto("/notifications");
@@ -123,7 +123,7 @@ test.describe("Notifications", () => {
     await register(page, userA);
     await page.goto(`/profile/${userB.username}`);
     await page.getByRole("button", { name: "Connect" }).click();
-    await expect(page.getByRole("button", { name: "Request sent" })).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("button", { name: "Withdraw request" })).toBeVisible({ timeout: 5000 });
 
     // userB accepts
     await pageB.goto("/connections");

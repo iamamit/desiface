@@ -40,6 +40,8 @@ test.describe("Messages", () => {
 
     await register(page, userA);
     await page.goto(`/messages/${userB.username}`);
+    // Wait for the other user's info to load (async API call) before sending
+    await expect(page.locator("text=@" + userB.username).first()).toBeVisible({ timeout: 5000 });
 
     const msgText = `Hello from ${userA.username} at ${Date.now()}`;
     await page.fill('input[placeholder="Type a message…"]', msgText);
@@ -61,6 +63,7 @@ test.describe("Messages", () => {
 
     // Send a message to userB
     await page.goto(`/messages/${userB.username}`);
+    await expect(page.locator("text=@" + userB.username).first()).toBeVisible({ timeout: 5000 });
     await page.fill('input[placeholder="Type a message…"]', "Hey there!");
     await page.getByRole("button", { name: "Send" }).click();
 
@@ -82,12 +85,14 @@ test.describe("Messages", () => {
 
     // userA sends a message
     await page.goto(`/messages/${userB.username}`);
+    await expect(page.locator("text=@" + userB.username).first()).toBeVisible({ timeout: 5000 });
     await page.fill('input[placeholder="Type a message…"]', "Hi from A");
     await page.getByRole("button", { name: "Send" }).click();
     await expect(page.locator("text=Hi from A")).toBeVisible({ timeout: 5000 });
 
     // userB opens the conversation and replies
     await pageB.goto(`/messages/${userA.username}`);
+    await expect(pageB.locator("text=@" + userA.username).first()).toBeVisible({ timeout: 5000 });
     await expect(pageB.locator("text=Hi from A")).toBeVisible({ timeout: 5000 });
     await pageB.fill('input[placeholder="Type a message…"]', "Hi back from B");
     await pageB.getByRole("button", { name: "Send" }).click();
