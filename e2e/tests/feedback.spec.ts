@@ -30,7 +30,8 @@ test.describe("Feedback", () => {
     await page.goto("/feed");
     await page.getByRole("button", { name: "Feedback" }).click();
 
-    await page.locator("textarea").fill("This is a test feedback message from Playwright.");
+    // Use placeholder-scoped selector to avoid matching the feed post textarea
+    await page.locator('textarea[placeholder*="Tell us"]').fill("This is a test feedback message from Playwright.");
     await page.getByRole("button", { name: "Send feedback" }).click();
 
     await expect(page.locator("text=Thanks for your feedback!")).toBeVisible({ timeout: 5000 });
@@ -44,7 +45,7 @@ test.describe("Feedback", () => {
     await page.getByRole("button", { name: "Feedback" }).click();
 
     await page.getByRole("button", { name: "Report a bug" }).click();
-    await page.locator("textarea").fill("Something broke when I clicked the like button.");
+    await page.locator('textarea[placeholder*="Describe"]').fill("Something broke when I clicked the like button.");
     await page.getByRole("button", { name: "Send feedback" }).click();
 
     await expect(page.locator("text=Thanks for your feedback!")).toBeVisible({ timeout: 5000 });
@@ -60,7 +61,7 @@ test.describe("Feedback", () => {
     const sendBtn = page.getByRole("button", { name: "Send feedback" });
     await expect(sendBtn).toBeDisabled();
 
-    await page.locator("textarea").fill("Something");
+    await page.locator('textarea[placeholder*="Tell us"]').fill("Something");
     await expect(sendBtn).toBeEnabled();
   });
 
@@ -72,8 +73,8 @@ test.describe("Feedback", () => {
     await page.getByRole("button", { name: "Feedback" }).click();
     await expect(page.getByRole("heading", { name: "Share feedback" })).toBeVisible();
 
-    // Click the backdrop (the semi-transparent overlay behind the modal content)
-    await page.locator(".absolute.inset-0.bg-black\\/50").click();
+    // Click the backdrop by targeting the top-left corner (outside the modal content)
+    await page.mouse.click(5, 5);
     await expect(page.getByRole("heading", { name: "Share feedback" })).not.toBeVisible({ timeout: 3000 });
   });
 });

@@ -54,8 +54,12 @@ export async function login(page: Page, user: ReturnType<typeof makeUser>) {
 }
 
 export async function logout(page: Page) {
-  // Clear auth token directly — CSS hover-based dropdown is unreliable in headless
-  await page.evaluate(() => localStorage.removeItem("access_token"));
+  // Clear all auth state: raw token, Zustand persist key, and cookie
+  await page.evaluate(() => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("auth"); // Zustand persist key (name: "auth")
+    document.cookie = "access_token=; path=/; max-age=0";
+  });
   await page.goto("/login");
   await page.waitForURL("**/login");
 }

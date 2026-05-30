@@ -83,7 +83,9 @@ test.describe("Feed", () => {
 
     page.on("dialog", (dialog) => dialog.accept());
     const postCard = page.locator('[data-testid="post-card"]').filter({ hasText: content });
-    await postCard.getByRole("button", { name: "Delete" }).click();
+    // Open the three-dot menu first, then click Delete
+    await postCard.getByTestId("post-menu-btn").click();
+    await postCard.getByTestId("delete-post-btn").click();
 
     await expect(page.locator("text=" + content)).not.toBeVisible({ timeout: 5000 });
   });
