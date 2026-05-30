@@ -19,15 +19,13 @@ class TestSubmitFeedback:
         r = client.post("/feedback", json={"type": "feedback", "message": "Love the app!"}, headers=h)
         assert r.status_code == 201
         body = r.json()
-        assert body["message"] == "Love the app!"
-        assert body["type"] == "feedback"
-        assert body["is_resolved"] is False
+        assert "id" in body  # returns {"id": "<uuid>"}
 
     def test_submit_bug_report(self, client):
         h = auth(client, "bug_user@example.com")
         r = client.post("/feedback", json={"type": "bug", "message": "Login broken"}, headers=h)
         assert r.status_code == 201
-        assert r.json()["type"] == "bug"
+        assert "id" in r.json()
 
     def test_unauthenticated_cannot_submit(self, client):
         r = client.post("/feedback", json={"type": "feedback", "message": "Hi"})
@@ -35,8 +33,8 @@ class TestSubmitFeedback:
 
     def test_empty_message_rejected(self, client):
         h = auth(client, "empty_fb@example.com")
-        r = client.post("/feedback", json={"type": "feedback", "message": ""})
-        assert r.status_code in (401, 422)
+        r = client.post("/feedback", json={"type": "feedback", "message": "   "}, headers=h)
+        assert r.status_code == 400
 
 
 class TestAdminFeedbackList:
@@ -49,8 +47,9 @@ class TestAdminFeedbackList:
 
         r = client.get("/feedback", headers=h_admin)
         assert r.status_code == 200
-        items = r.json()
-        assert len(items) >= 1
+        body = r.json()
+        assert "items" in body
+        assert body["total"] >= 1
 
     def test_non_admin_cannot_list_feedback(self, client):
         h = auth(client, "nonadmin_fb@example.com")
@@ -66,7 +65,8 @@ class TestAdminFeedbackList:
         _make_admin(db, "filter_admin@example.com")
 
         r = client.get("/feedback?type=bug", headers=h_admin)
-        items = r.json()
+        items = r.json()["items"]
+        assert len(items) >= 1
         assert all(i["type"] == "bug" for i in items)
 
 
@@ -97,7 +97,7 @@ class TestAdminResolve:
         r = client.patch(f"/feedback/{fb_id}/resolve", headers=h_admin)
         assert r.json()["is_resolved"] is False
 
-    def test_non_admin_cannot_resolve(self, client):
+    def test_non_admin_cannot_resolve(self, client, db):
         h_user = auth(client, "nres_user@example.com")
         fb_id = client.post(
             "/feedback", json={"type": "feedback", "message": "Nope"}, headers=h_user
