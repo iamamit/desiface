@@ -61,8 +61,11 @@ export default function ProfilePage() {
     setConnecting(true);
     try {
       if (!connStatus.connected && !connStatus.pending_sent && !connStatus.pending_received) {
-        await api.post(`/connections/${profile.id}`);
-        setConnStatus((s) => s ? { ...s, pending_sent: true } : s);
+        const { data } = await api.post<{ id: string }>(`/connections/${profile.id}`);
+        setConnStatus((s) => s ? { ...s, pending_sent: true, connection_id: data.id } : s);
+      } else if (connStatus.pending_sent && connStatus.connection_id) {
+        await api.delete(`/connections/${connStatus.connection_id}`);
+        setConnStatus((s) => s ? { ...s, pending_sent: false, connection_id: null } : s);
       } else if (connStatus.pending_received && connStatus.connection_id) {
         await api.patch(`/connections/${connStatus.connection_id}/accept`);
         setConnStatus((s) => s ? { ...s, connected: true, pending_received: false } : s);
@@ -78,7 +81,7 @@ export default function ProfilePage() {
   function connectLabel() {
     if (!connStatus) return "Connect";
     if (connStatus.connected) return "Connected ✓";
-    if (connStatus.pending_sent) return "Request sent";
+    if (connStatus.pending_sent) return "Withdraw request";
     if (connStatus.pending_received) return "Accept request";
     return "Connect";
   }
@@ -177,14 +180,14 @@ export default function ProfilePage() {
                       <>
                         <button
                           onClick={handleConnect}
-                          disabled={connecting || connStatus?.pending_sent}
+                          disabled={connecting}
                           className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-colors ${
                             connStatus?.connected
                               ? "border-2 border-gray-400 text-gray-600 dark:text-gray-400 hover:border-red-400 hover:text-red-400"
                               : connStatus?.pending_received
                               ? "gradient-accent text-white hover:opacity-90"
                               : connStatus?.pending_sent
-                              ? "border-2 border-gray-300 text-gray-400"
+                              ? "border-2 border-gray-400 text-gray-600 dark:text-gray-400 hover:border-red-400 hover:text-red-400"
                               : "gradient-accent text-white hover:opacity-90"
                           }`}
                         >
