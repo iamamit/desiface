@@ -18,6 +18,7 @@ from app.core.security import create_access_token, decode_access_token
 from app.models.otp_token import OTPToken
 from app.models.user import User
 from app.schemas.user import Token, UserPublic
+from app.services.news_scraper import auto_connect_to_news_bot
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 limiter = Limiter(key_func=get_remote_address)
@@ -107,7 +108,8 @@ def verify_otp(request: Request, payload: OTPVerify, db: Session = Depends(get_d
     otp.used = True
 
     user = db.query(User).filter(User.email == payload.email).first()
-    if not user:
+    is_new_user = user is None
+    if is_new_user:
         username = _generate_username(payload.email, db)
         user = User(
             id=uuid.uuid4(),
@@ -120,6 +122,10 @@ def verify_otp(request: Request, payload: OTPVerify, db: Session = Depends(get_d
 
     db.commit()
     db.refresh(user)
+
+    if is_new_user:
+        auto_connect_to_news_bot(user.id, db)
+        db.commit()
 
     token = create_access_token(str(user.id))
     return Token(access_token=token, user=UserPublic.model_validate(user))
